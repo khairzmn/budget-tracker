@@ -1,7 +1,6 @@
-const CACHE = 'kbt-v1';
+const CACHE = 'kbt-v2';
 const ASSETS = [
   './',
-  './index.html',
   './icon-192.png',
   './icon-512.png',
   './manifest.json',
@@ -24,8 +23,8 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
 
-  // For API calls (live prices), network-first with cache fallback
-  if (url.hostname.includes('gold-api') || url.hostname.includes('er-api')) {
+  // index.html: always network-first so updates show immediately
+  if (url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
     e.respondWith(
       fetch(e.request).then(r => {
         const clone = r.clone();
@@ -36,7 +35,19 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // For everything else, cache-first
+  // API calls (live prices): network-first with cache fallback
+  if (url.hostname.includes('gold-api') || url.hostname.includes('er-api') || url.hostname.includes('api.github')) {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        const clone = r.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return r;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Everything else: cache-first
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(r => {
       if (r.ok) {
