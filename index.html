@@ -1077,6 +1077,37 @@
     </div>
 
     <div class="settings-card" style="margin-top:0;">
+      <h3>☁️ Cloud Sync (GitHub Gist)</h3>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
+        Saves your budget data to a private GitHub Gist so it stays in sync across your phone and Mac.
+        Your data is stored only in your own GitHub account.
+      </p>
+      <div class="form-group">
+        <label>GitHub Personal Access Token
+          <a href="https://github.com/settings/tokens/new?scopes=gist&description=Khairul+Budget+Tracker" target="_blank"
+             style="margin-left:8px;font-size:.75rem;color:var(--accent);text-decoration:none;font-weight:500;">
+            Create token ↗
+          </a>
+        </label>
+        <div style="display:flex;gap:8px;">
+          <input type="password" id="sync-token-input" placeholder="ghp_xxxxxxxxxxxx"
+            style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.875rem;color:var(--text);outline:none;" />
+          <button class="btn secondary" id="sync-token-toggle" style="padding:8px 12px;font-size:.82rem;">Show</button>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:8px;">
+        <label>Gist ID <span style="font-weight:400;color:var(--text-muted);">(auto-filled after first sync)</span></label>
+        <input type="text" id="sync-gist-id-input" placeholder="auto-created on first sync"
+          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.875rem;color:var(--text);outline:none;" />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;">
+        <button class="btn" id="sync-save-btn">Save Token &amp; Sync Now</button>
+        <button class="btn secondary" id="sync-pull-btn">Pull from Cloud</button>
+        <span id="sync-status" style="font-size:.78rem;color:var(--text-muted);"></span>
+      </div>
+    </div>
+
+    <div class="settings-card" style="margin-top:0;">
       <h3>Data Management</h3>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn secondary" id="export-btn">Export JSON</button>
@@ -1251,6 +1282,7 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleSyncPush();
 }
 
 let state = loadState() || {
@@ -2074,6 +2106,12 @@ function renderCategories() {
 function renderSettings() {
   document.getElementById('setting-currency').value = state.settings.currency || '$';
   document.getElementById('setting-default-type').value = state.settings.defaultType || 'expense';
+  // Populate sync fields from localStorage
+  const tok = localStorage.getItem('kbt_sync_token') || '';
+  const gid = localStorage.getItem('kbt_sync_gist_id') || '';
+  document.getElementById('sync-token-input').value = tok;
+  document.getElementById('sync-gist-id-input').value = gid;
+  syncUpdateStatus();
 }
 
 document.getElementById('save-settings-btn').onclick = () => {
@@ -2287,17 +2325,151 @@ function renderScheduledContributions() {
 }
 
 // ══════════════════════════════════════════
-//  INIT
+//  CLOUD SYNC — GitHub Gist
 // ══════════════════════════════════════════
 
-processScheduledContributions();
-updateMonthLabel();
-renderDashboard();
+const GIST_FILENAME = 'khairul-budget-tracker.json';
+let syncDebounceTimer = null;
+
+function syncToken()  { return localStorage.getItem('kbt_sync_token') || ''; }
+function syncGistId() { return localStorage.getItem('kbt_sync_gist_id') || ''; }
+
+function syncUpdateStatus(msg, ok) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  if (msg === undefined) {
+    const gid = syncGistId();
+    const tok = syncToken();
+    el.textContent = tok && gid ? '✓ Sync configured' : tok ? 'Token set — sync once to create Gist' : 'Not configured';
+    el.style.color = tok && gid ? 'var(--green)' : 'var(--text-muted)';
+  } else {
+    el.textContent = msg;
+    el.style.color = ok === false ? 'var(--red)' : ok === true ? 'var(--green)' : 'var(--text-muted)';
+  }
+}
+
+async function syncPush(silent) {
+  const token = syncToken();
+  if (!token) { if (!silent) toast('Enter a GitHub token in Settings → Cloud Sync first.'); return; }
+  const payload = JSON.stringify(state, null, 2);
+  const body = { description: 'Khairul Budget Tracker data', public: false,
+    files: { [GIST_FILENAME]: { content: payload } } };
+  try {
+    const gistId = syncGistId();
+    const url = gistId ? `https://api.github.com/gists/${gistId}` : 'https://api.github.com/gists';
+    const method = gistId ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2022-11-28' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const data = await res.json();
+    if (!gistId) {
+      localStorage.setItem('kbt_sync_gist_id', data.id);
+      const inp = document.getElementById('sync-gist-id-input');
+      if (inp) inp.value = data.id;
+    }
+    const ts = new Date().toLocaleTimeString();
+    localStorage.setItem('kbt_sync_last', ts);
+    syncUpdateStatus(`✓ Synced at ${ts}`, true);
+    if (!silent) toast('Synced to cloud ☁️');
+  } catch (e) {
+    syncUpdateStatus('Sync failed: ' + e.message, false);
+    if (!silent) toast('Sync failed: ' + e.message);
+  }
+}
+
+async function syncPull() {
+  const token = syncToken();
+  const gistId = syncGistId();
+  if (!token || !gistId) { toast('Set up sync in Settings first.'); return; }
+  try {
+    syncUpdateStatus('Pulling…');
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: { Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
+    });
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const data = await res.json();
+    const file = data.files[GIST_FILENAME];
+    if (!file) throw new Error('Budget file not found in Gist');
+    const remote = JSON.parse(file.content);
+    state = remote;
+    saveState();
+    const ts = new Date().toLocaleTimeString();
+    syncUpdateStatus(`✓ Pulled at ${ts}`, true);
+    renderCurrentPage();
+    toast('Data pulled from cloud ☁️');
+  } catch (e) {
+    syncUpdateStatus('Pull failed: ' + e.message, false);
+    toast('Pull failed: ' + e.message);
+  }
+}
+
+// Auto-push 4 seconds after any saveState call (hoisted — called by saveState above)
+function scheduleSyncPush() {
+  if (!syncToken()) return;
+  clearTimeout(syncDebounceTimer);
+  syncDebounceTimer = setTimeout(() => syncPush(true), 4000);
+}
+
+// Sync UI wiring
+document.getElementById('sync-token-toggle').addEventListener('click', () => {
+  const inp = document.getElementById('sync-token-input');
+  const btn = document.getElementById('sync-token-toggle');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+});
+
+document.getElementById('sync-save-btn').addEventListener('click', async () => {
+  const token = document.getElementById('sync-token-input').value.trim();
+  const gid   = document.getElementById('sync-gist-id-input').value.trim();
+  if (!token) { toast('Paste your GitHub token first.'); return; }
+  localStorage.setItem('kbt_sync_token', token);
+  if (gid) localStorage.setItem('kbt_sync_gist_id', gid);
+  else localStorage.removeItem('kbt_sync_gist_id');
+  await syncPush(false);
+  syncUpdateStatus();
+});
+
+document.getElementById('sync-pull-btn').addEventListener('click', syncPull);
+
+// On startup: pull from Gist if configured, then render
+async function initSync() {
+  if (syncToken() && syncGistId()) {
+    try {
+      const res = await fetch(`https://api.github.com/gists/${syncGistId()}`, {
+        headers: { Authorization: `Bearer ${syncToken()}`, 'X-GitHub-Api-Version': '2022-11-28' },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const file = data.files[GIST_FILENAME];
+        if (file) {
+          const remote = JSON.parse(file.content);
+          state = remote;
+          localStorage.setItem('budgetiq_v1', JSON.stringify(state));
+        }
+      }
+    } catch (_) {}
+  }
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
 
 // ─── Service Worker ───
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+
+// ─── Boot: pull from Gist first, then render ───
+(async () => {
+  await initSync();
+  processScheduledContributions();
+  updateMonthLabel();
+  renderDashboard();
+})();
 </script>
 </body>
 </html>
