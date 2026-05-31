@@ -1056,39 +1056,27 @@
   <div class="page" id="page-groceries">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">Deposited This Month</div>
-        <div class="card-value green" id="groc-deposited">S$0.00</div>
-        <div class="card-sub" id="groc-deposited-sub">into account</div>
-      </div>
-      <div class="card">
         <div class="card-label">Spent This Month</div>
         <div class="card-value red" id="groc-spent">S$0.00</div>
-        <div class="card-sub" id="groc-spent-sub">from account</div>
+        <div class="card-sub" id="groc-spent-sub">0 transactions</div>
       </div>
       <div class="card">
-        <div class="card-label">Balance</div>
-        <div class="card-value" id="groc-balance">S$0.00</div>
-        <div class="card-sub" id="groc-balance-sub">remaining</div>
+        <div class="card-label">This Month's Budget</div>
+        <div class="card-value blue" id="groc-budget-val">S$0.00</div>
+        <div class="card-sub">set via transaction</div>
       </div>
-    </div>
-    <div class="chart-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Account Usage</span>
-        <span id="groc-pct" style="font-size:.82rem;font-weight:700;">0%</span>
-      </div>
-      <div class="progress-wrap" style="height:12px;">
-        <div class="progress-bar" id="groc-progress" style="width:0%;background:var(--green);transition:width .4s,background .4s;"></div>
+      <div class="card">
+        <div class="card-label">Remaining</div>
+        <div class="card-value green" id="groc-remaining">S$0.00</div>
+        <div class="card-sub" id="groc-remaining-sub"></div>
       </div>
     </div>
     <div class="section-header">
-      <h2>Groceries Account</h2>
-      <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-groc" onclick="openModal('expense','Groceries','deposit')">+ Deposit</button>
-        <button class="btn" id="btn-spend-groc" onclick="openModal('expense','Groceries','spend')">+ Spend</button>
-      </div>
+      <h2>Grocery Budget Transactions</h2>
+      <button class="btn" onclick="openModal('expense','Grocery Budget')">+ Add</button>
     </div>
     <div class="tx-table"><table><thead><tr>
-      <th>Date</th><th>Description</th><th>Flow</th><th>Amount</th><th></th>
+      <th>Date</th><th>Description</th><th>Amount</th><th></th>
     </tr></thead><tbody id="groc-tx-body"></tbody></table></div>
   </div>
 
@@ -1096,39 +1084,27 @@
   <div class="page" id="page-housing">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">Deposited This Month</div>
-        <div class="card-value green" id="hous-deposited">S$0.00</div>
-        <div class="card-sub" id="hous-deposited-sub">into account</div>
-      </div>
-      <div class="card">
         <div class="card-label">Spent This Month</div>
         <div class="card-value red" id="hous-spent">S$0.00</div>
-        <div class="card-sub" id="hous-spent-sub">from account</div>
+        <div class="card-sub" id="hous-spent-sub">0 transactions</div>
       </div>
       <div class="card">
-        <div class="card-label">Balance</div>
-        <div class="card-value" id="hous-balance">S$0.00</div>
-        <div class="card-sub" id="hous-balance-sub">remaining</div>
+        <div class="card-label">This Month's Budget</div>
+        <div class="card-value blue" id="hous-budget-val">S$0.00</div>
+        <div class="card-sub">set via transaction</div>
       </div>
-    </div>
-    <div class="chart-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Account Usage</span>
-        <span id="hous-pct" style="font-size:.82rem;font-weight:700;">0%</span>
-      </div>
-      <div class="progress-wrap" style="height:12px;">
-        <div class="progress-bar" id="hous-progress" style="width:0%;background:var(--green);transition:width .4s,background .4s;"></div>
+      <div class="card">
+        <div class="card-label">Remaining</div>
+        <div class="card-value green" id="hous-remaining">S$0.00</div>
+        <div class="card-sub" id="hous-remaining-sub"></div>
       </div>
     </div>
     <div class="section-header">
-      <h2>Housing Account</h2>
-      <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-hous" onclick="openModal('expense','Housing / Rent','deposit')">+ Deposit</button>
-        <button class="btn" id="btn-spend-hous" onclick="openModal('expense','Housing / Rent','spend')">+ Spend</button>
-      </div>
+      <h2>Housing Budget Transactions</h2>
+      <button class="btn" onclick="openModal('expense','Housing Budget')">+ Add</button>
     </div>
     <div class="tx-table"><table><thead><tr>
-      <th>Date</th><th>Description</th><th>Flow</th><th>Amount</th><th></th>
+      <th>Date</th><th>Description</th><th>Amount</th><th></th>
     </tr></thead><tbody id="hous-tx-body"></tbody></table></div>
   </div>
 
@@ -1352,8 +1328,8 @@
 const STORAGE_KEY = 'budgetiq_v1';
 
 const DEFAULT_CATEGORIES = {
-  income:     ['Salary', 'Freelance', 'Business', 'Rental Income', 'Side Hustle', 'Groceries', 'Housing / Rent', 'Other Income'],
-  expense:    ['Housing / Rent', 'Food & Dining', 'Groceries', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Other'],
+  income:     ['Salary', 'Freelance', 'Business', 'Rental Income', 'Side Hustle', 'Other Income'],
+  expense:    ['Housing / Rent', 'Food & Dining', 'Groceries', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Grocery Budget', 'Housing Budget', 'Other'],
   investment: ['Stocks / ETFs', 'Crypto', 'Savings Account', 'Real Estate', 'Bonds', 'Retirement Fund', 'Other Investment'],
 };
 
@@ -1454,8 +1430,7 @@ function txInMonth(ym) {
 }
 
 function sumBy(txs, type) {
-  // Exclude internal account spend transactions — they're tracked within their account tab only
-  return txs.filter(t => t.type === type && t.acctFlow !== 'spend').reduce((s, t) => s + t.amount, 0);
+  return txs.filter(t => t.type === type).reduce((s, t) => s + t.amount, 0);
 }
 
 function uid() {
@@ -1540,8 +1515,8 @@ function renderCurrentPage() {
     case 'cpf':          renderCPF();          break;
     case 'categories':   renderCategories();   break;
     case 'settings':     renderSettings();     break;
-    case 'groceries':    renderBudgetTab({ category:'Groceries',      prefix:'groc' }); break;
-    case 'housing':      renderBudgetTab({ category:'Housing / Rent', prefix:'hous' }); break;
+    case 'groceries':    renderBudgetTab({ category:'Grocery Budget',  prefix:'groc' }); break;
+    case 'housing':      renderBudgetTab({ category:'Housing Budget',  prefix:'hous' }); break;
   }
 }
 
@@ -1597,8 +1572,8 @@ function renderDashboard() {
   else statusText = `You're spending more than you earn this month.`;
   document.getElementById('goal-status-text').textContent = statusText;
 
-  // Category donut (exclude internal account spends)
-  const expTxs = txs.filter(t => t.type === 'expense' && t.acctFlow !== 'spend');
+  // Category donut
+  const expTxs = txs.filter(t => t.type === 'expense');
   const catTotals = {};
   expTxs.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
   const catLabels = Object.keys(catTotals);
@@ -2252,14 +2227,9 @@ document.getElementById('clear-data-btn').onclick = () => {
 
 let editingId = null;
 
-let _modalFlow = null; // 'deposit' | 'spend' | null
-
-function openModal(forceType, prefillCategory, flow) {
+function openModal(forceType, prefillCategory) {
   editingId = null;
-  _modalFlow = flow || null;
-  document.getElementById('modal-title').textContent =
-    flow === 'deposit' ? 'Deposit to Account' :
-    flow === 'spend'   ? 'Spend from Account' : 'Add Transaction';
+  document.getElementById('modal-title').textContent = 'Add Transaction';
   document.getElementById('tx-amount').value = '';
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-date').value = today();
@@ -2319,11 +2289,8 @@ document.getElementById('modal-save').onclick = () => {
     const tx = state.transactions.find(t => t.id === editingId);
     if (tx) Object.assign(tx, { type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null });
   } else {
-    const newTx = { id: uid(), type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null };
-    if (_modalFlow) newTx.acctFlow = _modalFlow; // 'deposit' or 'spend'
-    state.transactions.push(newTx);
+    state.transactions.push({ id: uid(), type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null });
   }
-  _modalFlow = null;
 
   saveState();
   closeModal();
@@ -2435,42 +2402,32 @@ function renderBudgetTab({ category, prefix }) {
     .filter(t => t.category === category && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const deposited = txs.filter(t => t.acctFlow === 'deposit').reduce((s, t) => s + t.amount, 0);
-  const spent     = txs.filter(t => t.acctFlow === 'spend').reduce((s, t) => s + t.amount, 0);
-  const balance   = deposited - spent;
-  const pct       = deposited > 0 ? Math.min(100, (spent / deposited) * 100) : 0;
-  const over      = balance < 0;
+  const total     = txs.reduce((s, t) => s + t.amount, 0);
+  // "budget" is the first/largest single transaction (the monthly allocation)
+  const budgetTx  = txs.length ? Math.max(...txs.map(t => t.amount)) : 0;
+  const remaining = budgetTx - total;
+  const over      = remaining < 0;
 
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setEl(`${prefix}-deposited`,     fmtSGD(deposited));
-  setEl(`${prefix}-spent`,         fmtSGD(spent));
-  setEl(`${prefix}-balance`,       (over ? '−' : '') + fmtSGD(Math.abs(balance)));
-  setEl(`${prefix}-balance-sub`,   over ? 'over deposited amount' : 'remaining');
-  setEl(`${prefix}-pct`,           deposited > 0 ? pct.toFixed(0) + '%' : '—');
+  setEl(`${prefix}-spent`,         fmtSGD(total));
+  setEl(`${prefix}-spent-sub`,     `${txs.length} transaction${txs.length !== 1 ? 's' : ''}`);
+  setEl(`${prefix}-budget-val`,    budgetTx ? fmtSGD(budgetTx) : 'S$—');
+  setEl(`${prefix}-remaining`,     total ? ((over ? '−' : '') + fmtSGD(Math.abs(remaining))) : 'S$—');
+  setEl(`${prefix}-remaining-sub`, over ? 'over budget' : 'remaining');
 
-  const balEl = document.getElementById(`${prefix}-balance`);
-  if (balEl) balEl.className = 'card-value ' + (over ? 'red' : balance === 0 ? 'blue' : 'green');
-
-  const bar = document.getElementById(`${prefix}-progress`);
-  if (bar) { bar.style.width = pct + '%'; bar.style.background = over ? 'var(--red)' : pct > 80 ? 'var(--amber)' : 'var(--green)'; }
+  const remEl = document.getElementById(`${prefix}-remaining`);
+  if (remEl) remEl.className = 'card-value ' + (over ? 'red' : 'green');
 
   const tbody = document.getElementById(`${prefix}-tx-body`);
   if (!tbody) return;
-  tbody.innerHTML = txs.length ? txs.map(t => {
-    const isDeposit = t.acctFlow === 'deposit';
-    const isSpend   = t.acctFlow === 'spend';
-    const badgeCls  = isDeposit ? 'income' : 'expense';
-    const label     = isDeposit ? 'Deposit' : isSpend ? 'Spend' : t.type;
-    const sign      = isDeposit ? '+' : '−';
-    return `<tr>
+  tbody.innerHTML = txs.length ? txs.map(t => `
+    <tr>
       <td>${t.date}</td>
       <td>${escHtml(t.description || '—')}</td>
-      <td><span class="badge ${badgeCls}">${label}</span></td>
-      <td class="amount-cell ${badgeCls}">${sign}${fmtSGD(t.amount)}</td>
+      <td class="amount-cell expense">${fmtSGD(t.amount)}</td>
       <td><button class="icon-btn" data-delete="${t.id}" title="Delete">🗑</button></td>
-    </tr>`;
-  }).join('') :
-    `<tr><td colspan="5"><div class="empty-state">No transactions this month. Use Deposit or Spend to add one.</div></td></tr>`;
+    </tr>`).join('') :
+    `<tr><td colspan="4"><div class="empty-state">No transactions this month.</div></td></tr>`;
 
   tbody.querySelectorAll('[data-delete]').forEach(btn => {
     btn.onclick = () => {
