@@ -2387,7 +2387,7 @@ function renderScheduledContributions() {
 // ══════════════════════════════════════════
 
 function renderBudgetTab({ category, prefix }) {
-  const ym = monthKey(viewDate);
+  const ym = currentMonthKey();
   const txs = [...state.transactions]
     .filter(t => t.category === category && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
