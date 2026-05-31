@@ -1056,22 +1056,30 @@
   <div class="page" id="page-groceries">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">This Month's Budget</div>
-        <div class="card-value blue" id="groc-budget-val">S$0.00</div>
-        <div class="card-sub" id="groc-budget-sub">allocated this month</div>
+        <div class="card-label">Monthly Budget</div>
+        <div class="card-value blue" id="groc-budget-val">S$—</div>
+        <div class="card-sub">Grocery Budget category</div>
       </div>
       <div class="card">
-        <div class="card-label">Total Transactions</div>
-        <div class="card-value" id="groc-count">0</div>
-        <div class="card-sub">entries</div>
+        <div class="card-label">Spent</div>
+        <div class="card-value red" id="groc-spent-val">S$—</div>
+        <div class="card-sub">Grocery Expenditure category</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Balance</div>
+        <div class="card-value green" id="groc-balance-val">S$—</div>
+        <div class="card-sub" id="groc-balance-sub">remaining</div>
       </div>
     </div>
     <div class="section-header">
-      <h2>Grocery Budget Transactions</h2>
-      <button class="btn" onclick="openModal('expense','Grocery Budget')">+ Add</button>
+      <h2>Groceries Transactions</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn secondary" onclick="openModal('expense','Grocery Budget')">+ Budget</button>
+        <button class="btn" onclick="openModal('expense','Grocery Expenditure')">+ Spend</button>
+      </div>
     </div>
     <div class="tx-table"><table><thead><tr>
-      <th>Date</th><th>Description</th><th>Amount</th><th></th>
+      <th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th></th>
     </tr></thead><tbody id="groc-tx-body"></tbody></table></div>
   </div>
 
@@ -1079,22 +1087,30 @@
   <div class="page" id="page-housing">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">This Month's Budget</div>
-        <div class="card-value blue" id="hous-budget-val">S$0.00</div>
-        <div class="card-sub" id="hous-budget-sub">allocated this month</div>
+        <div class="card-label">Monthly Budget</div>
+        <div class="card-value blue" id="hous-budget-val">S$—</div>
+        <div class="card-sub">Housing Budget category</div>
       </div>
       <div class="card">
-        <div class="card-label">Total Transactions</div>
-        <div class="card-value" id="hous-count">0</div>
-        <div class="card-sub">entries</div>
+        <div class="card-label">Spent</div>
+        <div class="card-value red" id="hous-spent-val">S$—</div>
+        <div class="card-sub">Housing Expenditure category</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Balance</div>
+        <div class="card-value green" id="hous-balance-val">S$—</div>
+        <div class="card-sub" id="hous-balance-sub">remaining</div>
       </div>
     </div>
     <div class="section-header">
-      <h2>Housing Budget Transactions</h2>
-      <button class="btn" onclick="openModal('expense','Housing Budget')">+ Add</button>
+      <h2>Housing Transactions</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn secondary" onclick="openModal('expense','Housing Budget')">+ Budget</button>
+        <button class="btn" onclick="openModal('expense','Housing Expenditure')">+ Spend</button>
+      </div>
     </div>
     <div class="tx-table"><table><thead><tr>
-      <th>Date</th><th>Description</th><th>Amount</th><th></th>
+      <th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th></th>
     </tr></thead><tbody id="hous-tx-body"></tbody></table></div>
   </div>
 
@@ -1319,7 +1335,7 @@ const STORAGE_KEY = 'budgetiq_v1';
 
 const DEFAULT_CATEGORIES = {
   income:     ['Salary', 'Freelance', 'Business', 'Rental Income', 'Side Hustle', 'Other Income'],
-  expense:    ['Housing / Rent', 'Food & Dining', 'Groceries', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Grocery Budget', 'Housing Budget', 'Other'],
+  expense:    ['Housing / Rent', 'Food & Dining', 'Groceries', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Grocery Budget', 'Grocery Expenditure', 'Housing Budget', 'Housing Expenditure', 'Other'],
   investment: ['Stocks / ETFs', 'Crypto', 'Savings Account', 'Real Estate', 'Bonds', 'Retirement Fund', 'Other Investment'],
 };
 
@@ -1505,8 +1521,8 @@ function renderCurrentPage() {
     case 'cpf':          renderCPF();          break;
     case 'categories':   renderCategories();   break;
     case 'settings':     renderSettings();     break;
-    case 'groceries':    renderBudgetTab({ category:'Grocery Budget',  prefix:'groc' }); break;
-    case 'housing':      renderBudgetTab({ category:'Housing Budget',  prefix:'hous' }); break;
+    case 'groceries':    renderBudgetTab({ budgetCat:'Grocery Budget',  spendCat:'Grocery Expenditure',  prefix:'groc' }); break;
+    case 'housing':      renderBudgetTab({ budgetCat:'Housing Budget',  spendCat:'Housing Expenditure',  prefix:'hous' }); break;
   }
 }
 
@@ -2386,29 +2402,39 @@ function renderScheduledContributions() {
 //  BUDGET TABS (Groceries / Housing)
 // ══════════════════════════════════════════
 
-function renderBudgetTab({ category, prefix }) {
+function renderBudgetTab({ budgetCat, spendCat, prefix }) {
   const ym = currentMonthKey();
-  const txs = [...state.transactions]
-    .filter(t => t.category === category && monthKey(t.date) === ym)
+  const all = [...state.transactions]
+    .filter(t => (t.category === budgetCat || t.category === spendCat) && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const total = txs.reduce((s, t) => s + t.amount, 0);
+  const budget  = all.filter(t => t.category === budgetCat).reduce((s, t) => s + t.amount, 0);
+  const spent   = all.filter(t => t.category === spendCat).reduce((s, t) => s + t.amount, 0);
+  const balance = budget - spent;
+  const over    = balance < 0;
 
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setEl(`${prefix}-budget-val`,  total > 0 ? fmtSGD(total) : 'S$—');
-  setEl(`${prefix}-budget-sub`,  total > 0 ? 'allocated this month' : 'no transactions yet');
-  setEl(`${prefix}-count`,       txs.length);
+  setEl(`${prefix}-budget-val`,  budget > 0 ? fmtSGD(budget) : 'S$—');
+  setEl(`${prefix}-spent-val`,   spent  > 0 ? fmtSGD(spent)  : 'S$—');
+  setEl(`${prefix}-balance-val`, budget > 0 ? (over ? '−' : '') + fmtSGD(Math.abs(balance)) : 'S$—');
+  setEl(`${prefix}-balance-sub`, over ? 'over budget' : 'remaining');
+
+  const balEl = document.getElementById(`${prefix}-balance-val`);
+  if (balEl) balEl.className = 'card-value ' + (budget === 0 ? 'blue' : over ? 'red' : 'green');
 
   const tbody = document.getElementById(`${prefix}-tx-body`);
   if (!tbody) return;
-  tbody.innerHTML = txs.length ? txs.map(t => `
-    <tr>
+  tbody.innerHTML = all.length ? all.map(t => {
+    const isBudget = t.category === budgetCat;
+    return `<tr>
       <td>${t.date}</td>
       <td>${escHtml(t.description || '—')}</td>
-      <td class="amount-cell expense">${fmtSGD(t.amount)}</td>
+      <td><span class="badge ${isBudget ? 'investment' : 'expense'}">${isBudget ? 'Budget' : 'Spend'}</span></td>
+      <td class="amount-cell ${isBudget ? 'blue' : 'expense'}">${isBudget ? '+' : '−'}${fmtSGD(t.amount)}</td>
       <td><button class="icon-btn" data-delete="${t.id}" title="Delete">🗑</button></td>
-    </tr>`).join('') :
-    `<tr><td colspan="4"><div class="empty-state">No transactions this month. Add one with the button above.</div></td></tr>`;
+    </tr>`;
+  }).join('') :
+    `<tr><td colspan="5"><div class="empty-state">No transactions this month.</div></td></tr>`;
 
   tbody.querySelectorAll('[data-delete]').forEach(btn => {
     btn.onclick = () => {
