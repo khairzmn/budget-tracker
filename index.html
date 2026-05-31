@@ -21,12 +21,12 @@
 
     :root {
       /* ── Finexy-style fintech palette ── */
-      --bg: #ebebeb;
+      --bg: #0f172a;
       --surface: #ffffff;
-      --surface-2: #f7f7f7;
-      --sidebar: #ffffff;
-      --sidebar-hover: rgba(240,78,35,0.06);
-      --sidebar-active: rgba(240,78,35,0.1);
+      --surface-2: #f8fafc;
+      --sidebar: #1e293b;
+      --sidebar-hover: rgba(255,255,255,0.06);
+      --sidebar-active: rgba(240,78,35,0.18);
       --accent: #f04e23;
       --accent-dark: #d43e15;
       --accent-light: rgba(240,78,35,0.1);
@@ -46,9 +46,9 @@
       --border-subtle: rgba(0,0,0,0.04);
       --radius: 16px;
       --radius-sm: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.06);
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.04), 0 2px 6px rgba(0,0,0,.04);
-      --shadow-lg: 0 4px 6px rgba(0,0,0,.05), 0 16px 40px rgba(0,0,0,.1);
+      --shadow: 0 2px 8px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.15);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.12);
+      --shadow-lg: 0 8px 16px rgba(0,0,0,.3), 0 24px 56px rgba(0,0,0,.25);
     }
 
     body {
@@ -72,16 +72,15 @@
       padding: 0;
       gap: 2px;
       overflow-y: auto;
-      border-right: 1px solid rgba(0,0,0,0.07);
-      box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+      border-right: 1px solid rgba(255,255,255,0.06);
     }
 
     #sidebar .logo {
-      color: var(--text);
+      color: #ffffff;
       font-size: .9375rem;
       font-weight: 800;
       padding: 22px 18px 18px;
-      border-bottom: 1px solid rgba(0,0,0,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
       margin-bottom: 6px;
       display: flex;
       align-items: center;
@@ -101,7 +100,7 @@
     .nav-btn {
       background: none;
       border: none;
-      color: var(--text-subtle);
+      color: rgba(255,255,255,0.5);
       font-size: .8125rem;
       font-weight: 500;
       padding: 9px 12px 9px 14px;
@@ -117,16 +116,16 @@
       font-family: inherit;
     }
 
-    .nav-btn:hover { background: var(--sidebar-hover); color: var(--accent); }
+    .nav-btn:hover { background: var(--sidebar-hover); color: rgba(255,255,255,0.85); }
     .nav-btn.active {
       background: var(--sidebar-active);
-      color: var(--accent);
+      color: #ffffff;
       font-weight: 600;
     }
     .nav-btn .icon { font-size: .875rem; width: 18px; text-align: center; flex-shrink: 0; }
 
     .nav-section-label {
-      color: var(--text-subtle);
+      color: rgba(255,255,255,0.35);
       font-size: .65rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -144,17 +143,18 @@
     }
 
     .topbar {
-      background: #ffffff;
+      background: #0f172a;
       padding: 13px 28px;
-      border-bottom: 1px solid rgba(0,0,0,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 10;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
+
+    .topbar h1 { color: rgba(255,255,255,0.9) !important; }
 
     .topbar h1 {
       font-size: 1rem;
@@ -170,7 +170,7 @@
     }
 
     .month-nav button {
-      background: rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.07);
       border: none;
       border-radius: 7px;
       width: 28px; height: 28px;
@@ -182,8 +182,8 @@
       font-family: inherit;
     }
 
-    .month-nav button:hover { background: rgba(240,78,35,0.1); color: var(--accent); }
-    .month-nav span { font-weight: 600; font-size: .8125rem; min-width: 120px; text-align: center; color: var(--text); letter-spacing: -.01em; }
+    .month-nav button:hover { background: rgba(240,78,35,0.2); color: var(--accent); }
+    .month-nav span { font-weight: 600; font-size: .8125rem; min-width: 120px; text-align: center; color: rgba(255,255,255,0.85); letter-spacing: -.01em; }
 
     .page { display: none; padding: 28px; flex-direction: column; gap: 22px; }
     .page.active { display: flex; }
@@ -256,45 +256,23 @@
     @media (max-width: 800px) { .charts-row { grid-template-columns: 1fr; } }
 
     .chart-card {
-      background: #111827;
+      background: var(--surface);
       border-radius: var(--radius);
       padding: 22px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
     .chart-card h3 {
       font-size: .69rem;
       font-weight: 700;
       margin-bottom: 18px;
-      color: rgba(255,255,255,0.45);
+      color: var(--text-subtle);
       text-transform: uppercase;
       letter-spacing: .08em;
     }
 
     .chart-wrap { position: relative; height: 220px; }
-
-    /* ── Dark chart-card: re-scope CSS vars so inline styles resolve correctly ── */
-    .chart-card {
-      --text-muted: rgba(255,255,255,0.55);
-      --text-subtle: rgba(255,255,255,0.38);
-      --text: #ffffff;
-      --border: rgba(255,255,255,0.08);
-    }
-    /* ── Dark chart-card overrides for inner content ── */
-    .chart-card .card-label { color: rgba(255,255,255,0.45); }
-    .chart-card a { color: var(--accent) !important; }
-    .chart-card .gold-panel-input {
-      background: rgba(255,255,255,0.07);
-      border-color: rgba(255,255,255,0.12);
-      color: #ffffff;
-    }
-    .chart-card .gold-panel-input::placeholder { color: rgba(255,255,255,0.3); }
-    .chart-card .gold-panel-input:focus {
-      background: rgba(255,255,255,0.1);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(240,78,35,0.25);
-    }
 
     /* ─── Transactions ─── */
     .section-header {
@@ -766,7 +744,7 @@
         padding: 12px 16px;
         padding-top: calc(12px + env(safe-area-inset-top, 0));
         gap: 10px;
-        background: #ffffff;
+        background: #0f172a;
       }
       .topbar h1 { font-size: 1rem; }
 
@@ -1127,7 +1105,7 @@
         </div>
 
         <!-- Monthly Regular Savings Plan scheduled contribution -->
-        <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;">
+        <div style="border-top:1px solid var(--border);padding-top:12px;">
           <div class="card-label" style="margin-bottom:8px;">Monthly Regular Savings Plan</div>
           <div id="scheduled-list"></div>
         </div>
@@ -1720,10 +1698,10 @@ function renderCurrentPage() {
 
 const _charts = {};
 
-// ── Chart.js global defaults: sans-serif font, 4-colour text system ──
+// ── Chart.js global defaults: sans-serif font, dark text on white cards ──
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
 Chart.defaults.font.size   = 11;
-Chart.defaults.color       = 'rgba(255,255,255,0.55)'; // muted text on dark cards
+Chart.defaults.color       = '#6b7280';
 
 function makeChart(id, config) {
   if (_charts[id]) { _charts[id].destroy(); }
@@ -1782,14 +1760,14 @@ function renderDashboard() {
     type: 'doughnut',
     data: {
       labels: catLabels.length ? catLabels : ['No expenses'],
-      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#111827' }],
+      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#ffffff' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: {
           position: 'right',
-          labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 },
+          labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 },
         },
         tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)}` } },
       },
@@ -1813,26 +1791,26 @@ function renderDashboard() {
     data: {
       labels: months,
       datasets: [
-        { label: 'Income', data: incArr, backgroundColor: 'rgba(34,197,94,.18)', borderColor: '#22c55e', borderWidth: 2, borderRadius: 6, borderSkipped: false },
-        { label: 'Expenses', data: expArr, backgroundColor: 'rgba(240,78,35,.18)', borderColor: '#f04e23', borderWidth: 2, borderRadius: 6, borderSkipped: false },
+        { label: 'Income', data: incArr, backgroundColor: '#22c55e', borderRadius: 6, borderSkipped: false },
+        { label: 'Expenses', data: expArr, backgroundColor: '#f04e23', borderRadius: 6, borderSkipped: false },
       ],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 16 } },
+        legend: { labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 16 } },
       },
       scales: {
         y: {
           beginAtZero: true,
-          ticks: { callback: v => fmt(v), color: 'rgba(255,255,255,0.45)' },
-          grid: { color: 'rgba(255,255,255,0.06)' },
-          border: { color: 'rgba(255,255,255,0.08)' },
+          ticks: { callback: v => fmt(v), color: '#9ca3af' },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          border: { color: 'rgba(0,0,0,0.08)' },
         },
         x: {
           grid: { display: false },
-          ticks: { color: 'rgba(255,255,255,0.55)' },
-          border: { color: 'rgba(255,255,255,0.08)' },
+          ticks: { color: '#9ca3af' },
+          border: { color: 'rgba(0,0,0,0.08)' },
         },
       },
     },
@@ -2332,11 +2310,11 @@ function renderCategories() {
     type: 'doughnut',
     data: {
       labels: eLabels.length ? eLabels : ['No expenses'],
-      datasets: [{ data: eLabels.length ? eLabels.map(c => expMap[c]) : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#111827' }],
+      datasets: [{ data: eLabels.length ? eLabels.map(c => expMap[c]) : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#ffffff' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 } } },
+      plugins: { legend: { position: 'right', labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
@@ -2348,11 +2326,11 @@ function renderCategories() {
     type: 'doughnut',
     data: {
       labels: iLabels.length ? iLabels : ['No income'],
-      datasets: [{ data: iLabels.length ? iLabels.map(c => incMap[c]) : [1], backgroundColor: PALETTE.slice().reverse(), borderWidth: 3, borderColor: '#111827' }],
+      datasets: [{ data: iLabels.length ? iLabels.map(c => incMap[c]) : [1], backgroundColor: PALETTE.slice().reverse(), borderWidth: 3, borderColor: '#ffffff' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 } } },
+      plugins: { legend: { position: 'right', labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
