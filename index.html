@@ -656,6 +656,10 @@
   <button class="nav-btn" data-page="cpf"><span class="icon">🏦</span><span>CPF</span></button>
   <button class="nav-btn" data-page="categories"><span class="icon">🏷️</span><span>Categories</span></button>
 
+  <span class="nav-section-label">Budgets</span>
+  <button class="nav-btn" data-page="groceries"><span class="icon">🛒</span><span>Groceries</span></button>
+  <button class="nav-btn" data-page="housing"><span class="icon">🏠</span><span>Housing</span></button>
+
   <span class="nav-section-label">System</span>
   <button class="nav-btn" data-page="settings"><span class="icon">⚙️</span><span>Settings</span></button>
 </nav>
@@ -1048,6 +1052,90 @@
     </div>
   </div>
 
+  <!-- ── Groceries ── -->
+  <div class="page" id="page-groceries">
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-label">Spent This Month</div>
+        <div class="card-value red" id="groc-spent">S$0.00</div>
+        <div class="card-sub" id="groc-spent-sub">0 transactions</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Budget</div>
+        <div class="card-value blue" id="groc-budget-display">S$300</div>
+        <div class="card-sub">
+          <input type="number" id="groc-budget-input" min="0" step="1" placeholder="300"
+            style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:.78rem;color:var(--text);outline:none;" />
+          <button onclick="saveBudgetTarget('Groceries','groc-budget-input')"
+            style="margin-left:4px;background:none;border:none;cursor:pointer;color:var(--accent);font-size:.78rem;font-weight:600;">Set</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Remaining</div>
+        <div class="card-value" id="groc-remaining">S$300</div>
+        <div class="card-sub" id="groc-remaining-sub"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Budget Usage</span>
+        <span id="groc-pct" style="font-size:.82rem;font-weight:700;">0%</span>
+      </div>
+      <div class="progress-wrap" style="height:12px;">
+        <div class="progress-bar" id="groc-progress" style="width:0%;background:var(--green);transition:width .4s ease;"></div>
+      </div>
+    </div>
+    <div class="section-header">
+      <h2>Groceries Transactions</h2>
+      <button class="btn" id="btn-add-groc">+ Add</button>
+    </div>
+    <div class="tx-table"><table><thead><tr>
+      <th>Date</th><th>Description</th><th>Amount</th><th></th>
+    </tr></thead><tbody id="groc-tx-body"></tbody></table></div>
+  </div>
+
+  <!-- ── Housing ── -->
+  <div class="page" id="page-housing">
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-label">Spent This Month</div>
+        <div class="card-value red" id="hous-spent">S$0.00</div>
+        <div class="card-sub" id="hous-spent-sub">0 transactions</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Budget</div>
+        <div class="card-value blue" id="hous-budget-display">S$200</div>
+        <div class="card-sub">
+          <input type="number" id="hous-budget-input" min="0" step="1" placeholder="200"
+            style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:.78rem;color:var(--text);outline:none;" />
+          <button onclick="saveBudgetTarget('Housing / Rent','hous-budget-input')"
+            style="margin-left:4px;background:none;border:none;cursor:pointer;color:var(--accent);font-size:.78rem;font-weight:600;">Set</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Remaining</div>
+        <div class="card-value" id="hous-remaining">S$200</div>
+        <div class="card-sub" id="hous-remaining-sub"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;">Budget Usage</span>
+        <span id="hous-pct" style="font-size:.82rem;font-weight:700;">0%</span>
+      </div>
+      <div class="progress-wrap" style="height:12px;">
+        <div class="progress-bar" id="hous-progress" style="width:0%;background:var(--green);transition:width .4s ease;"></div>
+      </div>
+    </div>
+    <div class="section-header">
+      <h2>Housing Transactions</h2>
+      <button class="btn" id="btn-add-hous">+ Add</button>
+    </div>
+    <div class="tx-table"><table><thead><tr>
+      <th>Date</th><th>Description</th><th>Amount</th><th></th>
+    </tr></thead><tbody id="hous-tx-body"></tbody></table></div>
+  </div>
+
   <!-- ── Settings ── -->
   <div class="page" id="page-settings">
     <div class="settings-card">
@@ -1269,7 +1357,7 @@ const STORAGE_KEY = 'budgetiq_v1';
 
 const DEFAULT_CATEGORIES = {
   income:     ['Salary', 'Freelance', 'Business', 'Rental Income', 'Side Hustle', 'Other Income'],
-  expense:    ['Housing / Rent', 'Food & Dining', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Other'],
+  expense:    ['Housing / Rent', 'Food & Dining', 'Groceries', 'Transport', 'Utilities', 'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Subscriptions', 'Personal Care', 'Credit Card', 'Nafkah', 'Other'],
   investment: ['Stocks / ETFs', 'Crypto', 'Savings Account', 'Real Estate', 'Bonds', 'Retirement Fund', 'Other Investment'],
 };
 
@@ -1338,6 +1426,10 @@ if (!state.goldPortfolio.items) {
   saveState();
 }
 if (!state.goldPortfolio.greatlink) state.goldPortfolio.greatlink = { units: 0, unitPriceSGD: 0, lastUpdated: '' };
+if (!state.categoryBudgets) {
+  state.categoryBudgets = { 'Groceries': 300, 'Housing / Rent': 200 };
+  saveState();
+}
 
 // ══════════════════════════════════════════
 //  HELPERS
@@ -1416,6 +1508,7 @@ const PAGE_TITLES = {
   dashboard: 'Dashboard', transactions: 'Transactions',
   goals: 'Savings Goals', investments: 'Investments',
   cpf: 'CPF Contributions', categories: 'Categories', settings: 'Settings',
+  groceries: '🛒 Groceries', housing: '🏠 Housing',
 };
 
 let currentPage = 'dashboard';
@@ -1454,6 +1547,8 @@ function renderCurrentPage() {
     case 'cpf':          renderCPF();          break;
     case 'categories':   renderCategories();   break;
     case 'settings':     renderSettings();     break;
+    case 'groceries':    renderBudgetTab({ pageId:'groceries', category:'Groceries',       prefix:'groc', defaultBudget:300 }); break;
+    case 'housing':      renderBudgetTab({ pageId:'housing',   category:'Housing / Rent',  prefix:'hous', defaultBudget:200 }); break;
   }
 }
 
@@ -2164,7 +2259,7 @@ document.getElementById('clear-data-btn').onclick = () => {
 
 let editingId = null;
 
-function openModal(forceType) {
+function openModal(forceType, prefillCategory) {
   editingId = null;
   document.getElementById('modal-title').textContent = 'Add Transaction';
   document.getElementById('tx-amount').value = '';
@@ -2176,6 +2271,11 @@ function openModal(forceType) {
   const type = forceType || state.settings.defaultType || 'expense';
   document.getElementById('tx-type').value = type;
   populateCategorySelect(type);
+  if (prefillCategory) {
+    const sel = document.getElementById('tx-category');
+    const opt = [...sel.options].find(o => o.value === prefillCategory);
+    if (opt) sel.value = prefillCategory;
+  }
 
   document.getElementById('tx-modal').classList.add('open');
   setTimeout(() => document.getElementById('tx-amount').focus(), 150);
@@ -2323,6 +2423,77 @@ function renderScheduledContributions() {
   }).join('');
 
 }
+
+// ══════════════════════════════════════════
+//  BUDGET TABS (Groceries / Housing)
+// ══════════════════════════════════════════
+
+function renderBudgetTab({ category, prefix, defaultBudget }) {
+  const budget = (state.categoryBudgets && state.categoryBudgets[category] != null)
+    ? state.categoryBudgets[category] : defaultBudget;
+
+  const ym = monthKey(viewDate);
+  const txs = [...state.transactions]
+    .filter(t => t.category === category && monthKey(t.date) === ym)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const spent  = txs.reduce((s, t) => s + t.amount, 0);
+  const remaining = budget - spent;
+  const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
+  const over = remaining < 0;
+
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setEl(`${prefix}-spent`,         fmtSGD(spent));
+  setEl(`${prefix}-spent-sub`,     `${txs.length} transaction${txs.length !== 1 ? 's' : ''}`);
+  setEl(`${prefix}-budget-display`, fmtSGD(budget));
+  setEl(`${prefix}-remaining`,     (over ? '−' : '') + fmtSGD(Math.abs(remaining)));
+  setEl(`${prefix}-remaining-sub`, over ? 'over budget' : 'left this month');
+  setEl(`${prefix}-pct`,           pct.toFixed(0) + '%');
+
+  const remEl = document.getElementById(`${prefix}-remaining`);
+  if (remEl) remEl.className = 'card-value ' + (over ? 'red' : 'green');
+
+  const bar = document.getElementById(`${prefix}-progress`);
+  if (bar) { bar.style.width = pct + '%'; bar.style.background = over ? 'var(--red)' : pct > 80 ? 'var(--amber)' : 'var(--green)'; }
+
+  const inp = document.getElementById(`${prefix}-budget-input`);
+  if (inp && !inp.matches(':focus')) inp.value = budget;
+
+  const tbody = document.getElementById(`${prefix}-tx-body`);
+  if (!tbody) return;
+  tbody.innerHTML = txs.length ? txs.map(t => `
+    <tr>
+      <td>${t.date}</td>
+      <td>${escHtml(t.description || '—')}</td>
+      <td class="amount-cell expense">${fmtSGD(t.amount)}</td>
+      <td><button class="icon-btn" data-delete="${t.id}" title="Delete">🗑</button></td>
+    </tr>`).join('') :
+    `<tr><td colspan="4"><div class="empty-state">No transactions this month.</div></td></tr>`;
+
+  tbody.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.onclick = () => {
+      state.transactions = state.transactions.filter(t => t.id !== btn.dataset.delete);
+      saveState();
+      renderCurrentPage();
+    };
+  });
+}
+
+function saveBudgetTarget(category, inputId) {
+  const val = parseFloat(document.getElementById(inputId).value);
+  if (isNaN(val) || val < 0) return;
+  if (!state.categoryBudgets) state.categoryBudgets = {};
+  state.categoryBudgets[category] = val;
+  saveState();
+  renderCurrentPage();
+  toast('Budget updated!');
+}
+
+// Wire up Add buttons for budget tabs
+document.addEventListener('DOMContentLoaded', () => {});
+// (buttons wired after DOM ready via event delegation below)
+document.getElementById('btn-add-groc').addEventListener('click', () => openModal('expense', 'Groceries'));
+document.getElementById('btn-add-hous').addEventListener('click', () => openModal('expense', 'Housing / Rent'));
 
 // ══════════════════════════════════════════
 //  CLOUD SYNC — GitHub Gist
