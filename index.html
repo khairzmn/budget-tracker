@@ -1083,8 +1083,8 @@
     <div class="section-header">
       <h2>Groceries Account</h2>
       <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-groc" onclick="openModal('income','Groceries')">+ Deposit</button>
-        <button class="btn" id="btn-spend-groc" onclick="openModal('expense','Groceries')">+ Spend</button>
+        <button class="btn secondary" id="btn-deposit-groc" onclick="openModal('expense','Groceries','deposit')">+ Deposit</button>
+        <button class="btn" id="btn-spend-groc" onclick="openModal('expense','Groceries','spend')">+ Spend</button>
       </div>
     </div>
     <div class="tx-table"><table><thead><tr>
@@ -1123,8 +1123,8 @@
     <div class="section-header">
       <h2>Housing Account</h2>
       <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-hous" onclick="openModal('income','Housing / Rent')">+ Deposit</button>
-        <button class="btn" id="btn-spend-hous" onclick="openModal('expense','Housing / Rent')">+ Spend</button>
+        <button class="btn secondary" id="btn-deposit-hous" onclick="openModal('expense','Housing / Rent','deposit')">+ Deposit</button>
+        <button class="btn" id="btn-spend-hous" onclick="openModal('expense','Housing / Rent','spend')">+ Spend</button>
       </div>
     </div>
     <div class="tx-table"><table><thead><tr>
@@ -1454,7 +1454,8 @@ function txInMonth(ym) {
 }
 
 function sumBy(txs, type) {
-  return txs.filter(t => t.type === type).reduce((s, t) => s + t.amount, 0);
+  // Exclude internal account spend transactions — they're tracked within their account tab only
+  return txs.filter(t => t.type === type && t.acctFlow !== 'spend').reduce((s, t) => s + t.amount, 0);
 }
 
 function uid() {
@@ -1596,8 +1597,8 @@ function renderDashboard() {
   else statusText = `You're spending more than you earn this month.`;
   document.getElementById('goal-status-text').textContent = statusText;
 
-  // Category donut
-  const expTxs = txs.filter(t => t.type === 'expense');
+  // Category donut (exclude internal account spends)
+  const expTxs = txs.filter(t => t.type === 'expense' && t.acctFlow !== 'spend');
   const catTotals = {};
   expTxs.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
   const catLabels = Object.keys(catTotals);
@@ -2251,9 +2252,14 @@ document.getElementById('clear-data-btn').onclick = () => {
 
 let editingId = null;
 
-function openModal(forceType, prefillCategory) {
+let _modalFlow = null; // 'deposit' | 'spend' | null
+
+function openModal(forceType, prefillCategory, flow) {
   editingId = null;
-  document.getElementById('modal-title').textContent = 'Add Transaction';
+  _modalFlow = flow || null;
+  document.getElementById('modal-title').textContent =
+    flow === 'deposit' ? 'Deposit to Account' :
+    flow === 'spend'   ? 'Spend from Account' : 'Add Transaction';
   document.getElementById('tx-amount').value = '';
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-date').value = today();
@@ -2313,8 +2319,11 @@ document.getElementById('modal-save').onclick = () => {
     const tx = state.transactions.find(t => t.id === editingId);
     if (tx) Object.assign(tx, { type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null });
   } else {
-    state.transactions.push({ id: uid(), type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null });
+    const newTx = { id: uid(), type, amount, description: desc, category: cat, date, recurring: recur, recurringInterval: recur ? interval : null };
+    if (_modalFlow) newTx.acctFlow = _modalFlow; // 'deposit' or 'spend'
+    state.transactions.push(newTx);
   }
+  _modalFlow = null;
 
   saveState();
   closeModal();
@@ -2426,8 +2435,8 @@ function renderBudgetTab({ category, prefix }) {
     .filter(t => t.category === category && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const deposited = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const spent     = txs.filter(t => t.type !== 'income').reduce((s, t) => s + t.amount, 0);
+  const deposited = txs.filter(t => t.acctFlow === 'deposit').reduce((s, t) => s + t.amount, 0);
+  const spent     = txs.filter(t => t.acctFlow === 'spend').reduce((s, t) => s + t.amount, 0);
   const balance   = deposited - spent;
   const pct       = deposited > 0 ? Math.min(100, (spent / deposited) * 100) : 0;
   const over      = balance < 0;
@@ -2448,12 +2457,16 @@ function renderBudgetTab({ category, prefix }) {
   const tbody = document.getElementById(`${prefix}-tx-body`);
   if (!tbody) return;
   tbody.innerHTML = txs.length ? txs.map(t => {
-    const isDeposit = t.type === 'income';
+    const isDeposit = t.acctFlow === 'deposit';
+    const isSpend   = t.acctFlow === 'spend';
+    const badgeCls  = isDeposit ? 'income' : 'expense';
+    const label     = isDeposit ? 'Deposit' : isSpend ? 'Spend' : t.type;
+    const sign      = isDeposit ? '+' : '−';
     return `<tr>
       <td>${t.date}</td>
       <td>${escHtml(t.description || '—')}</td>
-      <td><span class="badge ${isDeposit ? 'income' : 'expense'}">${isDeposit ? 'Deposit' : 'Spend'}</span></td>
-      <td class="amount-cell ${isDeposit ? 'income' : 'expense'}">${isDeposit ? '+' : '−'}${fmtSGD(t.amount)}</td>
+      <td><span class="badge ${badgeCls}">${label}</span></td>
+      <td class="amount-cell ${badgeCls}">${sign}${fmtSGD(t.amount)}</td>
       <td><button class="icon-btn" data-delete="${t.id}" title="Delete">🗑</button></td>
     </tr>`;
   }).join('') :
