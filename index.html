@@ -612,6 +612,37 @@
       margin-bottom: 20px;
     }
 
+    /* ─── Sync banner ─── */
+    #sync-banner {
+      background: rgba(255,149,0,0.1);
+      border: 1px solid rgba(255,149,0,0.25);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: .8125rem;
+      color: var(--text);
+    }
+    #sync-banner.error {
+      background: rgba(255,59,48,0.08);
+      border-color: rgba(255,59,48,0.2);
+    }
+    #sync-banner span { flex: 1; }
+    #sync-banner button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 980px;
+      padding: 5px 14px;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
     /* ─── Toast ─── */
     #toast {
       position: fixed;
@@ -843,6 +874,7 @@
 
   <!-- ── Dashboard ── -->
   <div class="page active" id="page-dashboard">
+    <div id="sync-banner" style="display:none;"></div>
     <div class="cards-row" id="summary-cards">
       <div class="card">
         <div class="card-label">Income</div>
@@ -1663,6 +1695,11 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   });
 });
 
+function navigate(page) {
+  const btn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+  if (btn) btn.click();
+}
+
 // ─── Mobile sidebar toggle ───
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
@@ -1714,6 +1751,17 @@ const PALETTE = ['#93c5fd','#86efac','#fdba74','#fca5a5','#c4b5fd','#67e8f9','#f
 // ══════════════════════════════════════════
 
 function renderDashboard() {
+  // Sync banner
+  const banner = document.getElementById('sync-banner');
+  if (!syncToken() || !syncGistId()) {
+    banner.style.display = 'flex';
+    banner.className = '';
+    banner.innerHTML = `<span>☁️ Cloud sync not set up on this device — data won't persist across devices.</span>
+      <button onclick="navigate('settings')">Set up sync</button>`;
+  } else {
+    banner.style.display = 'none';
+  }
+
   const ym = currentMonthKey();
   const txs = txInMonth(ym);
   const income = sumBy(txs, 'income');
@@ -2691,11 +2739,16 @@ async function syncPush(silent) {
 async function syncPull() {
   const token = syncToken();
   const gistId = syncGistId();
-  if (!token || !gistId) { toast('Set up sync in Settings first.'); return; }
+  if (!token || !gistId) {
+    toast('Go to Settings → Cloud Sync to set up your GitHub token.');
+    navigate('settings');
+    return;
+  }
   try {
     syncUpdateStatus('Pulling…');
     const res = await fetch(`https://api.github.com/gists/${gistId}`, {
       headers: { Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' },
+      cache: 'no-store',
     });
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
     const data = await res.json();
@@ -2703,14 +2756,16 @@ async function syncPull() {
     if (!file) throw new Error('Budget file not found in Gist');
     const remote = JSON.parse(file.content);
     state = remote;
-    saveState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    processScheduledContributions();
+    updateMonthLabel();
     const ts = new Date().toLocaleTimeString();
     syncUpdateStatus(`✓ Pulled at ${ts}`, true);
     renderCurrentPage();
-    toast('Data pulled from cloud ☁️');
+    toast('Synced from cloud ☁️');
   } catch (e) {
     syncUpdateStatus('Pull failed: ' + e.message, false);
-    toast('Pull failed: ' + e.message);
+    toast('Sync failed: ' + e.message);
   }
 }
 
@@ -2744,22 +2799,22 @@ document.getElementById('sync-pull-btn').addEventListener('click', syncPull);
 
 // On startup: pull from Gist if configured, then render
 async function initSync() {
-  if (syncToken() && syncGistId()) {
-    try {
-      const res = await fetch(`https://api.github.com/gists/${syncGistId()}`, {
-        headers: { Authorization: `Bearer ${syncToken()}`, 'X-GitHub-Api-Version': '2022-11-28' },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const file = data.files[GIST_FILENAME];
-        if (file) {
-          const remote = JSON.parse(file.content);
-          state = remote;
-          localStorage.setItem('budgetiq_v1', JSON.stringify(state));
-        }
+  if (!syncToken() || !syncGistId()) return;
+  try {
+    const res = await fetch(`https://api.github.com/gists/${syncGistId()}`, {
+      headers: { Authorization: `Bearer ${syncToken()}`, 'X-GitHub-Api-Version': '2022-11-28' },
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const file = data.files[GIST_FILENAME];
+      if (file) {
+        const remote = JSON.parse(file.content);
+        state = remote;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
-    } catch (_) {}
-  }
+    }
+  } catch (_) {}
 }
 
 // ══════════════════════════════════════════
