@@ -256,23 +256,45 @@
     @media (max-width: 800px) { .charts-row { grid-template-columns: 1fr; } }
 
     .chart-card {
-      background: var(--surface);
+      background: #111827;
       border-radius: var(--radius);
       padding: 22px;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255,255,255,0.06);
     }
 
     .chart-card h3 {
       font-size: .69rem;
       font-weight: 700;
       margin-bottom: 18px;
-      color: var(--text-subtle);
+      color: rgba(255,255,255,0.45);
       text-transform: uppercase;
       letter-spacing: .08em;
     }
 
     .chart-wrap { position: relative; height: 220px; }
+
+    /* ── Dark chart-card: re-scope CSS vars so inline styles resolve correctly ── */
+    .chart-card {
+      --text-muted: rgba(255,255,255,0.55);
+      --text-subtle: rgba(255,255,255,0.38);
+      --text: #ffffff;
+      --border: rgba(255,255,255,0.08);
+    }
+    /* ── Dark chart-card overrides for inner content ── */
+    .chart-card .card-label { color: rgba(255,255,255,0.45); }
+    .chart-card a { color: var(--accent) !important; }
+    .chart-card .gold-panel-input {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+      color: #ffffff;
+    }
+    .chart-card .gold-panel-input::placeholder { color: rgba(255,255,255,0.3); }
+    .chart-card .gold-panel-input:focus {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(240,78,35,0.25);
+    }
 
     /* ─── Transactions ─── */
     .section-header {
@@ -1105,7 +1127,7 @@
         </div>
 
         <!-- Monthly Regular Savings Plan scheduled contribution -->
-        <div style="border-top:1px solid var(--border);padding-top:12px;">
+        <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;">
           <div class="card-label" style="margin-bottom:8px;">Monthly Regular Savings Plan</div>
           <div id="scheduled-list"></div>
         </div>
@@ -1698,6 +1720,11 @@ function renderCurrentPage() {
 
 const _charts = {};
 
+// ── Chart.js global defaults: sans-serif font, 4-colour text system ──
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+Chart.defaults.font.size   = 11;
+Chart.defaults.color       = 'rgba(255,255,255,0.55)'; // muted text on dark cards
+
 function makeChart(id, config) {
   if (_charts[id]) { _charts[id].destroy(); }
   const ctx = document.getElementById(id);
@@ -1755,12 +1782,15 @@ function renderDashboard() {
     type: 'doughnut',
     data: {
       labels: catLabels.length ? catLabels : ['No expenses'],
-      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#ffffff' }],
+      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#111827' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { font: { size: 11, family: '-apple-system' }, boxWidth: 12, boxHeight: 12 } },
+        legend: {
+          position: 'right',
+          labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 },
+        },
         tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)}` } },
       },
     },
@@ -1783,24 +1813,26 @@ function renderDashboard() {
     data: {
       labels: months,
       datasets: [
-        { label: 'Income', data: incArr, backgroundColor: 'rgba(34,197,94,.15)', borderColor: '#22c55e', borderWidth: 2, borderRadius: 6, borderSkipped: false },
-        { label: 'Expenses', data: expArr, backgroundColor: 'rgba(240,78,35,.15)', borderColor: '#f04e23', borderWidth: 2, borderRadius: 6, borderSkipped: false },
+        { label: 'Income', data: incArr, backgroundColor: 'rgba(34,197,94,.18)', borderColor: '#22c55e', borderWidth: 2, borderRadius: 6, borderSkipped: false },
+        { label: 'Expenses', data: expArr, backgroundColor: 'rgba(240,78,35,.18)', borderColor: '#f04e23', borderWidth: 2, borderRadius: 6, borderSkipped: false },
       ],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { font: { size: 11, family: '-apple-system' }, boxWidth: 12, boxHeight: 12 } } },
+      plugins: {
+        legend: { labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 16 } },
+      },
       scales: {
         y: {
           beginAtZero: true,
-          ticks: { callback: v => fmt(v), font: { size: 10, family: '-apple-system' }, color: '#aeaeb2' },
-          grid: { color: 'rgba(0,0,0,0.05)' },
-          border: { color: 'rgba(0,0,0,0.08)' },
+          ticks: { callback: v => fmt(v), color: 'rgba(255,255,255,0.45)' },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
         },
         x: {
           grid: { display: false },
-          ticks: { font: { size: 11, family: '-apple-system' }, color: '#8e8e93' },
-          border: { color: 'rgba(0,0,0,0.08)' },
+          ticks: { color: 'rgba(255,255,255,0.55)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
         },
       },
     },
@@ -2300,11 +2332,11 @@ function renderCategories() {
     type: 'doughnut',
     data: {
       labels: eLabels.length ? eLabels : ['No expenses'],
-      datasets: [{ data: eLabels.length ? eLabels.map(c => expMap[c]) : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#fff' }],
+      datasets: [{ data: eLabels.length ? eLabels.map(c => expMap[c]) : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#111827' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { font: { size: 11, family: '-apple-system' }, boxWidth: 12, boxHeight: 12 } } },
+      plugins: { legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
@@ -2316,11 +2348,11 @@ function renderCategories() {
     type: 'doughnut',
     data: {
       labels: iLabels.length ? iLabels : ['No income'],
-      datasets: [{ data: iLabels.length ? iLabels.map(c => incMap[c]) : [1], backgroundColor: PALETTE.slice().reverse(), borderWidth: 3, borderColor: '#fff' }],
+      datasets: [{ data: iLabels.length ? iLabels.map(c => incMap[c]) : [1], backgroundColor: PALETTE.slice().reverse(), borderWidth: 3, borderColor: '#111827' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { font: { size: 11, family: '-apple-system' }, boxWidth: 12, boxHeight: 12 } } },
+      plugins: { legend: { position: 'right', labels: { color: 'rgba(255,255,255,0.85)', boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
