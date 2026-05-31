@@ -1066,9 +1066,9 @@
         <div class="card-sub">Grocery Expenditure category</div>
       </div>
       <div class="card">
-        <div class="card-label">Balance</div>
+        <div class="card-label">Running Balance</div>
         <div class="card-value green" id="groc-balance-val">S$—</div>
-        <div class="card-sub" id="groc-balance-sub">remaining</div>
+        <div class="card-sub" id="groc-balance-sub">rolls over monthly</div>
       </div>
     </div>
     <div class="section-header">
@@ -1097,9 +1097,9 @@
         <div class="card-sub">Housing Expenditure category</div>
       </div>
       <div class="card">
-        <div class="card-label">Balance</div>
+        <div class="card-label">Running Balance</div>
         <div class="card-value green" id="hous-balance-val">S$—</div>
-        <div class="card-sub" id="hous-balance-sub">remaining</div>
+        <div class="card-sub" id="hous-balance-sub">rolls over monthly</div>
       </div>
     </div>
     <div class="section-header">
@@ -2404,14 +2404,22 @@ function renderScheduledContributions() {
 
 function renderBudgetTab({ budgetCat, spendCat, prefix }) {
   const ym = currentMonthKey();
+
+  // This month's transactions for the list
   const all = [...state.transactions]
     .filter(t => (t.category === budgetCat || t.category === spendCat) && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const budget  = all.filter(t => t.category === budgetCat).reduce((s, t) => s + t.amount, 0);
-  const spent   = all.filter(t => t.category === spendCat).reduce((s, t) => s + t.amount, 0);
-  const balance = budget - spent;
-  const over    = balance < 0;
+  // This month's budget allocation and spending
+  const budget = all.filter(t => t.category === budgetCat).reduce((s, t) => s + t.amount, 0);
+  const spent  = all.filter(t => t.category === spendCat).reduce((s, t) => s + t.amount, 0);
+
+  // Cumulative balance across ALL months (rolls over)
+  const allTime   = state.transactions.filter(t => t.category === budgetCat || t.category === spendCat);
+  const totalIn   = allTime.filter(t => t.category === budgetCat).reduce((s, t) => s + t.amount, 0);
+  const totalOut  = allTime.filter(t => t.category === spendCat).reduce((s, t) => s + t.amount, 0);
+  const balance   = totalIn - totalOut;
+  const over      = balance < 0;
 
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   setEl(`${prefix}-budget-val`,  budget > 0 ? fmtSGD(budget) : 'S$—');
