@@ -20,35 +20,35 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      /* ── Finexy-style fintech palette ── */
-      --bg: #0f172a;
+      /* ── macOS Sonoma / Ventura system palette ── */
+      --bg: #f2f2f7;
       --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --sidebar: #1e293b;
-      --sidebar-hover: rgba(255,255,255,0.06);
-      --sidebar-active: rgba(240,78,35,0.18);
-      --accent: #f04e23;
-      --accent-dark: #d43e15;
-      --accent-light: rgba(240,78,35,0.1);
-      --green: #22c55e;
-      --green-light: rgba(34,197,94,0.12);
-      --red: #ef4444;
-      --red-light: rgba(239,68,68,0.12);
-      --blue: #3b82f6;
-      --blue-light: rgba(59,130,246,0.1);
-      --amber: #f59e0b;
-      --amber-light: rgba(245,158,11,0.12);
-      --silver: #9ca3af;
-      --text: #111827;
-      --text-muted: #4b5563;
-      --text-subtle: #6b7280;
-      --border: rgba(0,0,0,0.08);
-      --border-subtle: rgba(0,0,0,0.04);
-      --radius: 16px;
-      --radius-sm: 10px;
-      --shadow: 0 2px 8px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.15);
-      --shadow-sm: 0 1px 3px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.12);
-      --shadow-lg: 0 8px 16px rgba(0,0,0,.3), 0 24px 56px rgba(0,0,0,.25);
+      --surface-2: #f9f9fb;
+      --sidebar: rgba(30,30,32,0.88);
+      --sidebar-hover: rgba(255,255,255,0.08);
+      --sidebar-active: rgba(0,122,255,0.85);
+      --accent: #007AFF;
+      --accent-dark: #0066d6;
+      --accent-light: rgba(0,122,255,0.1);
+      --green: #34C759;
+      --green-light: rgba(52,199,89,0.12);
+      --red: #FF3B30;
+      --red-light: rgba(255,59,48,0.12);
+      --blue: #007AFF;
+      --blue-light: rgba(0,122,255,0.1);
+      --amber: #FF9500;
+      --amber-light: rgba(255,149,0,0.12);
+      --silver: #8e8e93;
+      --text: #1c1c1e;
+      --text-muted: #636366;
+      --text-subtle: #6e6e73;
+      --border: rgba(0,0,0,0.1);
+      --border-subtle: rgba(0,0,0,0.05);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
+      --shadow-sm: 0 0 0 1px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+      --shadow-lg: 0 0 0 1px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.12);
     }
 
     body {
@@ -67,12 +67,14 @@
       width: 228px;
       min-width: 228px;
       background: var(--sidebar);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
       display: flex;
       flex-direction: column;
       padding: 0;
       gap: 2px;
       overflow-y: auto;
-      border-right: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.07);
     }
 
     #sidebar .logo {
@@ -143,9 +145,11 @@
     }
 
     .topbar {
-      background: #0f172a;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       padding: 13px 28px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -153,8 +157,6 @@
       top: 0;
       z-index: 10;
     }
-
-    .topbar h1 { color: rgba(255,255,255,0.9) !important; }
 
     .topbar h1 {
       font-size: 1rem;
@@ -170,7 +172,7 @@
     }
 
     .month-nav button {
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.05);
       border: none;
       border-radius: 7px;
       width: 28px; height: 28px;
@@ -182,8 +184,8 @@
       font-family: inherit;
     }
 
-    .month-nav button:hover { background: rgba(240,78,35,0.2); color: var(--accent); }
-    .month-nav span { font-weight: 600; font-size: .8125rem; min-width: 120px; text-align: center; color: rgba(255,255,255,0.85); letter-spacing: -.01em; }
+    .month-nav button:hover { background: rgba(0,122,255,0.1); color: var(--accent); }
+    .month-nav span { font-weight: 600; font-size: .8125rem; min-width: 120px; text-align: center; color: var(--text); letter-spacing: -.01em; }
 
     .page { display: none; padding: 28px; flex-direction: column; gap: 22px; }
     .page.active { display: flex; }
@@ -290,35 +292,30 @@
     }
 
     .btn {
-      background: #111827;
+      background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 980px;
-      padding: 8px 18px;
+      padding: 7px 16px;
       font-size: .8125rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background .15s ease, opacity .15s ease, transform .1s ease;
+      transition: background .15s ease, opacity .15s ease;
       letter-spacing: -.01em;
       font-family: inherit;
       white-space: nowrap;
     }
 
-    .btn:hover { background: #1f2937; transform: translateY(-1px); }
-    .btn:active { opacity: 0.85; transform: translateY(0); }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:active { opacity: 0.8; }
     .btn.secondary {
       background: rgba(0,0,0,0.06);
       color: var(--text);
       border: none;
     }
-    .btn.secondary:hover { background: rgba(0,0,0,0.1); transform: translateY(-1px); }
-    .btn.primary-accent {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn.primary-accent:hover { background: var(--accent-dark); }
+    .btn.secondary:hover { background: rgba(0,0,0,0.1); }
     .btn.danger { background: var(--red); }
-    .btn.danger:hover { background: #dc2626; }
+    .btn.danger:hover { background: #e62e24; }
 
     .filters {
       display: flex;
@@ -340,7 +337,7 @@
       transition: border-color .15s ease, box-shadow .15s ease;
     }
 
-    .filters select:focus, .filters input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,78,35,0.15); }
+    .filters select:focus, .filters input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
 
     .tx-table {
       background: var(--surface);
@@ -373,7 +370,7 @@
     }
 
     .tx-table tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
-    .tx-table tr:hover td { background: rgba(240,78,35,0.04); }
+    .tx-table tr:hover td { background: rgba(0,122,255,0.04); }
 
     .badge {
       display: inline-flex;
@@ -385,9 +382,9 @@
       letter-spacing: .01em;
     }
 
-    .badge.income { background: rgba(34,197,94,0.12); color: #15803d; }
-    .badge.expense { background: rgba(239,68,68,0.12); color: #b91c1c; }
-    .badge.investment { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+    .badge.income { background: rgba(52,199,89,0.15); color: #1a7a35; }
+    .badge.expense { background: rgba(255,59,48,0.12); color: #c0392b; }
+    .badge.investment { background: rgba(0,122,255,0.12); color: #005ec2; }
 
     .amount-cell { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -.01em; }
     .amount-cell.income { color: var(--green); }
@@ -493,7 +490,7 @@
     .form-group textarea:focus {
       border-color: var(--accent);
       background: #fff;
-      box-shadow: 0 0 0 3px rgba(240,78,35,0.15);
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
     }
 
     .form-group .checkbox-row {
@@ -559,7 +556,7 @@
       font-family: inherit;
       transition: border-color .15s ease, box-shadow .15s ease;
     }
-    .goal-input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,78,35,0.15); }
+    .goal-input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
 
     .history-table {
       background: var(--surface);
@@ -592,9 +589,9 @@
       font-size: .67rem;
       font-weight: 600;
     }
-    .status-chip.met { background: rgba(34,197,94,0.12); color: #15803d; }
-    .status-chip.missed { background: rgba(239,68,68,0.12); color: #b91c1c; }
-    .status-chip.partial { background: rgba(245,158,11,0.15); color: #92400e; }
+    .status-chip.met { background: rgba(52,199,89,0.15); color: #1a7a35; }
+    .status-chip.missed { background: rgba(255,59,48,0.12); color: #c0392b; }
+    .status-chip.partial { background: rgba(255,149,0,0.15); color: #b36200; }
 
     /* ─── Settings ─── */
     .settings-card {
@@ -642,8 +639,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(245,158,11,0.12);
-      color: #92400e;
+      background: rgba(255,149,0,0.12);
+      color: #b36200;
       border-radius: 980px;
       padding: 4px 12px;
       font-size: .74rem;
@@ -652,7 +649,7 @@
       border: none;
     }
     .gold-rate-badge.loading { background: rgba(0,0,0,0.06); color: var(--text-muted); }
-    .gold-rate-badge.error { background: rgba(239,68,68,0.12); color: #b91c1c; }
+    .gold-rate-badge.error { background: rgba(255,59,48,0.12); color: #c0392b; }
 
     .gold-panel-input {
       background: rgba(0,0,0,0.04);
@@ -666,7 +663,7 @@
       font-family: inherit;
       transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
     }
-    .gold-panel-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(240,78,35,0.15); }
+    .gold-panel-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
 
     .gold-divider {
       display: flex;
@@ -700,7 +697,7 @@
       transition: background .15s ease;
       font-family: inherit;
     }
-    #mobile-menu-btn:hover { background: rgba(240,78,35,0.1); }
+    #mobile-menu-btn:hover { background: rgba(0,122,255,0.1); }
 
     /* ─── Sidebar overlay backdrop ─── */
     #sidebar-backdrop {
@@ -744,7 +741,7 @@
         padding: 12px 16px;
         padding-top: calc(12px + env(safe-area-inset-top, 0));
         gap: 10px;
-        background: #0f172a;
+        background: rgba(242,242,247,0.85);
       }
       .topbar h1 { font-size: 1rem; }
 
@@ -1698,10 +1695,10 @@ function renderCurrentPage() {
 
 const _charts = {};
 
-// ── Chart.js global defaults: sans-serif font, dark text on white cards ──
-Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+// ── Chart.js global defaults: sans-serif system font ──
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
 Chart.defaults.font.size   = 11;
-Chart.defaults.color       = '#6b7280';
+Chart.defaults.color       = '#8e8e93';
 
 function makeChart(id, config) {
   if (_charts[id]) { _charts[id].destroy(); }
@@ -1710,7 +1707,7 @@ function makeChart(id, config) {
   _charts[id] = new Chart(ctx, config);
 }
 
-const PALETTE = ['#f04e23','#22c55e','#f59e0b','#ef4444','#8b5cf6','#3b82f6','#ec4899','#14b8a6','#a3e635','#fb923c'];
+const PALETTE = ['#007AFF','#34C759','#FF9500','#FF3B30','#AF52DE','#5AC8FA','#FF2D55','#FFCC00','#30D158','#64D2FF'];
 
 // ══════════════════════════════════════════
 //  DASHBOARD
@@ -1740,7 +1737,7 @@ function renderDashboard() {
   document.getElementById('goal-pct').textContent = pct + '%';
   const bar = document.getElementById('goal-bar');
   bar.style.width = pct + '%';
-  bar.style.background = pct >= 100 ? '#22c55e' : pct >= 60 ? '#f04e23' : '#ef4444';
+  bar.style.background = pct >= 100 ? '#34C759' : pct >= 60 ? '#FF9500' : '#FF3B30';
 
   let statusText = '';
   if (goal === 0) statusText = 'Set a savings goal in the Goals page.';
@@ -1765,10 +1762,7 @@ function renderDashboard() {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'right',
-          labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 },
-        },
+        legend: { position: 'right', labels: { boxWidth: 12, boxHeight: 12, padding: 14 } },
         tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)}` } },
       },
     },
@@ -1791,25 +1785,24 @@ function renderDashboard() {
     data: {
       labels: months,
       datasets: [
-        { label: 'Income', data: incArr, backgroundColor: '#22c55e', borderRadius: 6, borderSkipped: false },
-        { label: 'Expenses', data: expArr, backgroundColor: '#f04e23', borderRadius: 6, borderSkipped: false },
+        { label: 'Income', data: incArr, backgroundColor: '#34C759', borderRadius: 6, borderSkipped: false },
+        { label: 'Expenses', data: expArr, backgroundColor: '#FF3B30', borderRadius: 6, borderSkipped: false },
       ],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 16 } },
+        legend: { labels: { boxWidth: 12, boxHeight: 12, padding: 16 } },
       },
       scales: {
         y: {
           beginAtZero: true,
-          ticks: { callback: v => fmt(v), color: '#9ca3af' },
+          ticks: { callback: v => fmt(v) },
           grid: { color: 'rgba(0,0,0,0.05)' },
           border: { color: 'rgba(0,0,0,0.08)' },
         },
         x: {
           grid: { display: false },
-          ticks: { color: '#9ca3af' },
           border: { color: 'rgba(0,0,0,0.08)' },
         },
       },
@@ -2314,7 +2307,7 @@ function renderCategories() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 } } },
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
@@ -2330,7 +2323,7 @@ function renderCategories() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'right', labels: { color: '#374151', boxWidth: 12, boxHeight: 12, padding: 14 } } },
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, boxHeight: 12, padding: 14 } } },
     },
   });
 
