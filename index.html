@@ -1056,19 +1056,14 @@
   <div class="page" id="page-groceries">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">Spent This Month</div>
-        <div class="card-value red" id="groc-spent">S$0.00</div>
-        <div class="card-sub" id="groc-spent-sub">0 transactions</div>
-      </div>
-      <div class="card">
         <div class="card-label">This Month's Budget</div>
         <div class="card-value blue" id="groc-budget-val">S$0.00</div>
-        <div class="card-sub">set via transaction</div>
+        <div class="card-sub" id="groc-budget-sub">allocated this month</div>
       </div>
       <div class="card">
-        <div class="card-label">Remaining</div>
-        <div class="card-value green" id="groc-remaining">S$0.00</div>
-        <div class="card-sub" id="groc-remaining-sub"></div>
+        <div class="card-label">Total Transactions</div>
+        <div class="card-value" id="groc-count">0</div>
+        <div class="card-sub">entries</div>
       </div>
     </div>
     <div class="section-header">
@@ -1084,19 +1079,14 @@
   <div class="page" id="page-housing">
     <div class="cards-row">
       <div class="card">
-        <div class="card-label">Spent This Month</div>
-        <div class="card-value red" id="hous-spent">S$0.00</div>
-        <div class="card-sub" id="hous-spent-sub">0 transactions</div>
-      </div>
-      <div class="card">
         <div class="card-label">This Month's Budget</div>
         <div class="card-value blue" id="hous-budget-val">S$0.00</div>
-        <div class="card-sub">set via transaction</div>
+        <div class="card-sub" id="hous-budget-sub">allocated this month</div>
       </div>
       <div class="card">
-        <div class="card-label">Remaining</div>
-        <div class="card-value green" id="hous-remaining">S$0.00</div>
-        <div class="card-sub" id="hous-remaining-sub"></div>
+        <div class="card-label">Total Transactions</div>
+        <div class="card-value" id="hous-count">0</div>
+        <div class="card-sub">entries</div>
       </div>
     </div>
     <div class="section-header">
@@ -2402,21 +2392,12 @@ function renderBudgetTab({ category, prefix }) {
     .filter(t => t.category === category && monthKey(t.date) === ym)
     .sort((a, b) => b.date.localeCompare(a.date));
 
-  const total     = txs.reduce((s, t) => s + t.amount, 0);
-  // "budget" is the first/largest single transaction (the monthly allocation)
-  const budgetTx  = txs.length ? Math.max(...txs.map(t => t.amount)) : 0;
-  const remaining = budgetTx - total;
-  const over      = remaining < 0;
+  const total = txs.reduce((s, t) => s + t.amount, 0);
 
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  setEl(`${prefix}-spent`,         fmtSGD(total));
-  setEl(`${prefix}-spent-sub`,     `${txs.length} transaction${txs.length !== 1 ? 's' : ''}`);
-  setEl(`${prefix}-budget-val`,    budgetTx ? fmtSGD(budgetTx) : 'S$—');
-  setEl(`${prefix}-remaining`,     total ? ((over ? '−' : '') + fmtSGD(Math.abs(remaining))) : 'S$—');
-  setEl(`${prefix}-remaining-sub`, over ? 'over budget' : 'remaining');
-
-  const remEl = document.getElementById(`${prefix}-remaining`);
-  if (remEl) remEl.className = 'card-value ' + (over ? 'red' : 'green');
+  setEl(`${prefix}-budget-val`,  total > 0 ? fmtSGD(total) : 'S$—');
+  setEl(`${prefix}-budget-sub`,  total > 0 ? 'allocated this month' : 'no transactions yet');
+  setEl(`${prefix}-count`,       txs.length);
 
   const tbody = document.getElementById(`${prefix}-tx-body`);
   if (!tbody) return;
@@ -2427,7 +2408,7 @@ function renderBudgetTab({ category, prefix }) {
       <td class="amount-cell expense">${fmtSGD(t.amount)}</td>
       <td><button class="icon-btn" data-delete="${t.id}" title="Delete">🗑</button></td>
     </tr>`).join('') :
-    `<tr><td colspan="4"><div class="empty-state">No transactions this month.</div></td></tr>`;
+    `<tr><td colspan="4"><div class="empty-state">No transactions this month. Add one with the button above.</div></td></tr>`;
 
   tbody.querySelectorAll('[data-delete]').forEach(btn => {
     btn.onclick = () => {
