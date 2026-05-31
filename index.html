@@ -1707,7 +1707,7 @@ function makeChart(id, config) {
   _charts[id] = new Chart(ctx, config);
 }
 
-const PALETTE = ['#007AFF','#34C759','#FF9500','#FF3B30','#AF52DE','#5AC8FA','#FF2D55','#FFCC00','#30D158','#64D2FF'];
+const PALETTE = ['#93c5fd','#86efac','#fdba74','#fca5a5','#c4b5fd','#67e8f9','#f9a8d4','#fde68a','#6ee7b7','#a5b4fc'];
 
 // ══════════════════════════════════════════
 //  DASHBOARD
@@ -1737,7 +1737,7 @@ function renderDashboard() {
   document.getElementById('goal-pct').textContent = pct + '%';
   const bar = document.getElementById('goal-bar');
   bar.style.width = pct + '%';
-  bar.style.background = pct >= 100 ? '#34C759' : pct >= 60 ? '#FF9500' : '#FF3B30';
+  bar.style.background = pct >= 100 ? '#86efac' : pct >= 60 ? '#fdba74' : '#fca5a5';
 
   let statusText = '';
   if (goal === 0) statusText = 'Set a savings goal in the Goals page.';
@@ -1785,8 +1785,8 @@ function renderDashboard() {
     data: {
       labels: months,
       datasets: [
-        { label: 'Income', data: incArr, backgroundColor: '#34C759', borderRadius: 6, borderSkipped: false },
-        { label: 'Expenses', data: expArr, backgroundColor: '#FF3B30', borderRadius: 6, borderSkipped: false },
+        { label: 'Income', data: incArr, backgroundColor: '#86efac', borderRadius: 6, borderSkipped: false },
+        { label: 'Expenses', data: expArr, backgroundColor: '#fca5a5', borderRadius: 6, borderSkipped: false },
       ],
     },
     options: {
