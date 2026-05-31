@@ -1337,35 +1337,9 @@
       <button class="btn" id="save-settings-btn" style="margin-top:8px;">Save Settings</button>
     </div>
 
-    <div class="settings-card" style="margin-top:0;">
-      <h3>☁️ Cloud Sync (GitHub Gist)</h3>
-      <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">
-        Saves your budget data to a private GitHub Gist so it stays in sync across your phone and Mac.
-        Your data is stored only in your own GitHub account.
-      </p>
-      <div class="form-group">
-        <label>GitHub Personal Access Token
-          <a href="https://github.com/settings/tokens/new?scopes=gist&description=Khairul+Budget+Tracker" target="_blank"
-             style="margin-left:8px;font-size:.75rem;color:var(--accent);text-decoration:none;font-weight:500;">
-            Create token ↗
-          </a>
-        </label>
-        <div style="display:flex;gap:8px;">
-          <input type="password" id="sync-token-input" placeholder="ghp_xxxxxxxxxxxx"
-            style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.875rem;color:var(--text);outline:none;" />
-          <button class="btn secondary" id="sync-token-toggle" style="padding:8px 12px;font-size:.82rem;">Show</button>
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:8px;">
-        <label>Gist ID <span style="font-weight:400;color:var(--text-muted);">(auto-filled after first sync)</span></label>
-        <input type="text" id="sync-gist-id-input" placeholder="auto-created on first sync"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.875rem;color:var(--text);outline:none;" />
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center;">
-        <button class="btn" id="sync-save-btn">Save Token &amp; Sync Now</button>
-        <button class="btn secondary" id="sync-pull-btn">Pull from Cloud</button>
-        <span id="sync-status" style="font-size:.78rem;color:var(--text-muted);"></span>
-      </div>
+    <div class="settings-card" id="sync-card" style="margin-top:0;">
+      <h3>☁️ Cloud Sync</h3>
+      <div id="sync-setup-ui"></div>
     </div>
 
     <div class="settings-card" style="margin-top:0;">
@@ -2401,12 +2375,102 @@ function renderCategories() {
 function renderSettings() {
   document.getElementById('setting-currency').value = state.settings.currency || '$';
   document.getElementById('setting-default-type').value = state.settings.defaultType || 'expense';
-  // Populate sync fields from localStorage
-  const tok = localStorage.getItem('kbt_sync_token') || '';
-  const gid = localStorage.getItem('kbt_sync_gist_id') || '';
-  document.getElementById('sync-token-input').value = tok;
-  document.getElementById('sync-gist-id-input').value = gid;
-  syncUpdateStatus();
+  renderSyncCard();
+}
+
+function renderSyncCard() {
+  const tok = syncToken();
+  const gid = syncGistId();
+  const el  = document.getElementById('sync-setup-ui');
+  if (!el) return;
+
+  if (tok && gid) {
+    // ── Connected state ──
+    const last = localStorage.getItem('kbt_sync_last') || '—';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;display:inline-block;"></span>
+        <span style="font-size:.875rem;font-weight:600;color:var(--text);">Sync active</span>
+        <span style="font-size:.78rem;color:var(--text-muted);margin-left:auto;">Last: ${last}</span>
+      </div>
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;border:1px solid var(--border);">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-subtle);margin-bottom:6px;">Sync Code — enter this on your other devices</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <code id="sync-code-display" style="flex:1;font-size:.8125rem;font-family:monospace;color:var(--accent);word-break:break-all;">${gid}</code>
+          <button onclick="copySync()" style="background:var(--accent);color:#fff;border:none;border-radius:980px;padding:5px 14px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Copy</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="syncPull()">↓ Pull latest now</button>
+        <button class="btn secondary" onclick="syncPush(false)">↑ Push now</button>
+        <button class="btn secondary" onclick="disconnectSync()" style="color:var(--red);">Disconnect</button>
+      </div>
+      <div id="sync-status" style="font-size:.78rem;color:var(--text-muted);margin-top:10px;"></div>`;
+  } else if (tok && !gid) {
+    // ── Token entered, no Gist yet ──
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0;display:inline-block;"></span>
+        <span style="font-size:.875rem;font-weight:600;color:var(--text);">Token saved — finishing setup…</span>
+      </div>
+      <div style="font-size:.8125rem;color:var(--text-muted);margin-bottom:14px;">
+        Do you have a <strong>Sync Code</strong> from another device? Paste it below.<br>
+        Otherwise click <strong>Create new sync</strong> to start fresh.
+      </div>
+      <input id="sync-code-input" type="text" placeholder="Paste sync code (optional)"
+        style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.875rem;color:var(--text);outline:none;margin-bottom:12px;font-family:inherit;" />
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="finishSyncSetup()">Connect</button>
+        <button class="btn secondary" onclick="disconnectSync()">Cancel</button>
+      </div>
+      <div id="sync-status" style="font-size:.78rem;color:var(--text-muted);margin-top:10px;"></div>`;
+  } else {
+    // ── Not set up ──
+    el.innerHTML = `
+      <p style="font-size:.8125rem;color:var(--text-muted);margin-bottom:18px;line-height:1.65;">
+        Keeps your data in sync across your phone and Mac — stored privately in your own GitHub account.
+        Takes about 60 seconds to set up.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">1</span>
+          <div style="flex:1;">
+            <div style="font-size:.875rem;font-weight:600;margin-bottom:4px;color:var(--text);">Create a free GitHub account (if needed)</div>
+            <a href="https://github.com/signup" target="_blank" rel="noopener"
+              style="font-size:.8rem;color:var(--accent);text-decoration:none;font-weight:500;">Sign up at github.com ↗</a>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">2</span>
+          <div style="flex:1;">
+            <div style="font-size:.875rem;font-weight:600;margin-bottom:4px;color:var(--text);">Create a sync token</div>
+            <a href="https://github.com/settings/tokens/new?scopes=gist&description=Finance+Tracker+Sync" target="_blank" rel="noopener"
+              style="font-size:.8rem;color:var(--accent);text-decoration:none;font-weight:500;">Open token page ↗</a>
+            <div style="font-size:.76rem;color:var(--text-subtle);margin-top:3px;">Set expiry → Generate → copy the token</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">3</span>
+          <div style="flex:1;">
+            <div style="font-size:.875rem;font-weight:600;margin-bottom:6px;color:var(--text);">Paste it here</div>
+            <div style="display:flex;gap:8px;">
+              <input type="password" id="sync-token-input" placeholder="ghp_xxxxxxxxxxxx"
+                style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:.875rem;color:var(--text);outline:none;font-family:inherit;"
+                oninput="syncTokenLiveCheck(this.value)" />
+              <button onclick="toggleSyncTokenVisibility()" id="sync-token-toggle"
+                style="background:rgba(0,0,0,0.05);border:none;border-radius:var(--radius-sm);padding:8px 12px;font-size:.8rem;cursor:pointer;font-family:inherit;color:var(--text);white-space:nowrap;">Show</button>
+            </div>
+            <div id="sync-token-feedback" style="font-size:.76rem;margin-top:5px;min-height:16px;"></div>
+          </div>
+        </div>
+
+      </div>
+      <div id="sync-status" style="font-size:.78rem;color:var(--text-muted);margin-top:10px;"></div>`;
+  }
 }
 
 document.getElementById('save-settings-btn').onclick = () => {
@@ -2693,15 +2757,8 @@ function syncGistId() { return localStorage.getItem('kbt_sync_gist_id') || ''; }
 function syncUpdateStatus(msg, ok) {
   const el = document.getElementById('sync-status');
   if (!el) return;
-  if (msg === undefined) {
-    const gid = syncGistId();
-    const tok = syncToken();
-    el.textContent = tok && gid ? '✓ Sync configured' : tok ? 'Token set — sync once to create Gist' : 'Not configured';
-    el.style.color = tok && gid ? 'var(--green)' : 'var(--text-muted)';
-  } else {
-    el.textContent = msg;
-    el.style.color = ok === false ? 'var(--red)' : ok === true ? 'var(--green)' : 'var(--text-muted)';
-  }
+  el.textContent = msg || '';
+  el.style.color = ok === false ? 'var(--red)' : ok === true ? 'var(--green)' : 'var(--text-muted)';
 }
 
 async function syncPush(silent) {
@@ -2723,8 +2780,7 @@ async function syncPush(silent) {
     const data = await res.json();
     if (!gistId) {
       localStorage.setItem('kbt_sync_gist_id', data.id);
-      const inp = document.getElementById('sync-gist-id-input');
-      if (inp) inp.value = data.id;
+      if (!silent) renderSyncCard();
     }
     const ts = new Date().toLocaleTimeString();
     localStorage.setItem('kbt_sync_last', ts);
@@ -2776,26 +2832,98 @@ function scheduleSyncPush() {
   syncDebounceTimer = setTimeout(() => syncPush(true), 4000);
 }
 
-// Sync UI wiring
-document.getElementById('sync-token-toggle').addEventListener('click', () => {
+// ── Sync UI helpers (called from inline onclick in renderSyncCard) ──
+
+let _tokenCheckTimer = null;
+function syncTokenLiveCheck(val) {
+  const fb = document.getElementById('sync-token-feedback');
+  if (!fb) return;
+  clearTimeout(_tokenCheckTimer);
+  if (!val.startsWith('ghp_') && !val.startsWith('github_pat_') && val.length < 10) {
+    fb.textContent = '';
+    return;
+  }
+  fb.textContent = 'Checking…';
+  fb.style.color = 'var(--text-muted)';
+  _tokenCheckTimer = setTimeout(async () => {
+    try {
+      const r = await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${val}`, 'X-GitHub-Api-Version': '2022-11-28' },
+        cache: 'no-store',
+      });
+      if (r.ok) {
+        const u = await r.json();
+        fb.textContent = `✓ Signed in as @${u.login} — click Save below`;
+        fb.style.color = 'var(--green)';
+        localStorage.setItem('kbt_sync_token', val);
+        // Auto-discover existing Gist
+        const gr = await fetch('https://api.github.com/gists?per_page=50', {
+          headers: { Authorization: `Bearer ${val}`, 'X-GitHub-Api-Version': '2022-11-28' },
+          cache: 'no-store',
+        });
+        if (gr.ok) {
+          const gists = await gr.json();
+          const match = gists.find(g => g.files && g.files[GIST_FILENAME]);
+          if (match) {
+            localStorage.setItem('kbt_sync_gist_id', match.id);
+            fb.textContent = `✓ Found existing sync data for @${u.login} — connecting…`;
+            setTimeout(() => renderSyncCard(), 800);
+          } else {
+            // No existing Gist — show connect button
+            renderSyncCard();
+          }
+        }
+      } else {
+        fb.textContent = '✗ Invalid token — check and try again';
+        fb.style.color = 'var(--red)';
+      }
+    } catch {
+      fb.textContent = '✗ Network error — check your connection';
+      fb.style.color = 'var(--red)';
+    }
+  }, 600);
+}
+
+function toggleSyncTokenVisibility() {
   const inp = document.getElementById('sync-token-input');
   const btn = document.getElementById('sync-token-toggle');
+  if (!inp) return;
   inp.type = inp.type === 'password' ? 'text' : 'password';
   btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
-});
+}
 
-document.getElementById('sync-save-btn').addEventListener('click', async () => {
-  const token = document.getElementById('sync-token-input').value.trim();
-  const gid   = document.getElementById('sync-gist-id-input').value.trim();
-  if (!token) { toast('Paste your GitHub token first.'); return; }
-  localStorage.setItem('kbt_sync_token', token);
-  if (gid) localStorage.setItem('kbt_sync_gist_id', gid);
-  else localStorage.removeItem('kbt_sync_gist_id');
-  await syncPush(false);
-  syncUpdateStatus();
-});
+async function finishSyncSetup() {
+  const code = (document.getElementById('sync-code-input')?.value || '').trim();
+  if (code) {
+    localStorage.setItem('kbt_sync_gist_id', code);
+    syncUpdateStatus('Pulling data…');
+    await syncPull();
+  } else {
+    syncUpdateStatus('Creating sync…');
+    await syncPush(false);
+    localStorage.setItem('kbt_sync_last', new Date().toLocaleTimeString());
+  }
+  renderSyncCard();
+}
 
-document.getElementById('sync-pull-btn').addEventListener('click', syncPull);
+async function copySync() {
+  const gid = syncGistId();
+  if (!gid) return;
+  try {
+    await navigator.clipboard.writeText(gid);
+    toast('Sync Code copied!');
+  } catch {
+    toast('Copy: ' + gid);
+  }
+}
+
+function disconnectSync() {
+  if (!confirm('Remove sync credentials from this device? Your cloud data is NOT deleted.')) return;
+  localStorage.removeItem('kbt_sync_token');
+  localStorage.removeItem('kbt_sync_gist_id');
+  renderSyncCard();
+  toast('Sync disconnected on this device.');
+}
 
 // On startup: pull from Gist if configured, then render
 async function initSync() {
