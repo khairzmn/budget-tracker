@@ -1083,8 +1083,8 @@
     <div class="section-header">
       <h2>Groceries Account</h2>
       <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-groc">+ Deposit</button>
-        <button class="btn" id="btn-spend-groc">+ Spend</button>
+        <button class="btn secondary" id="btn-deposit-groc" onclick="openModal('income','Groceries')">+ Deposit</button>
+        <button class="btn" id="btn-spend-groc" onclick="openModal('expense','Groceries')">+ Spend</button>
       </div>
     </div>
     <div class="tx-table"><table><thead><tr>
@@ -1123,8 +1123,8 @@
     <div class="section-header">
       <h2>Housing Account</h2>
       <div style="display:flex;gap:8px;">
-        <button class="btn secondary" id="btn-deposit-hous">+ Deposit</button>
-        <button class="btn" id="btn-spend-hous">+ Spend</button>
+        <button class="btn secondary" id="btn-deposit-hous" onclick="openModal('income','Housing / Rent')">+ Deposit</button>
+        <button class="btn" id="btn-spend-hous" onclick="openModal('expense','Housing / Rent')">+ Spend</button>
       </div>
     </div>
     <div class="tx-table"><table><thead><tr>
@@ -2468,11 +2468,6 @@ function renderBudgetTab({ category, prefix }) {
   });
 }
 
-// Wire up Deposit / Spend buttons
-document.getElementById('btn-deposit-groc').addEventListener('click', () => openModal('income',   'Groceries'));
-document.getElementById('btn-spend-groc').addEventListener('click',   () => openModal('expense',  'Groceries'));
-document.getElementById('btn-deposit-hous').addEventListener('click', () => openModal('income',   'Housing / Rent'));
-document.getElementById('btn-spend-hous').addEventListener('click',   () => openModal('expense',  'Housing / Rent'));
 
 // ══════════════════════════════════════════
 //  CLOUD SYNC — GitHub Gist
