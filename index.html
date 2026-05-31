@@ -2954,6 +2954,18 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
+// ─── One-tap setup via URL params (?t=TOKEN&g=GIST_ID) ───
+(function () {
+  const p = new URLSearchParams(location.search);
+  const t = p.get('t'), g = p.get('g');
+  if (t && g) {
+    localStorage.setItem('kbt_sync_token', t);
+    localStorage.setItem('kbt_sync_gist_id', g);
+    // Remove params from URL without reloading
+    history.replaceState(null, '', location.pathname);
+  }
+})();
+
 // ─── Boot: pull from Gist first, then render ───
 (async () => {
   await initSync();

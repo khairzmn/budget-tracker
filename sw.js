@@ -1,4 +1,4 @@
-const CACHE = 'kbt-v9';
+const CACHE = 'kbt-v10';
 const ASSETS = [
   './',
   './icon-192.png',
