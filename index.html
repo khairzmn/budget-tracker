@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Khairul Budget Tracker</title>
+  <title>Finance Tracker</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
@@ -803,7 +803,7 @@
 
 <!-- ═══ SIDEBAR ═══ -->
 <nav id="sidebar">
-  <div class="logo"><span>💰</span> <span class="text">Khairul Budget</span></div>
+  <div class="logo"><span>💰</span> <span class="text">Finance Tracker</span></div>
 
   <span class="nav-section-label">Overview</span>
   <button class="nav-btn active" data-page="dashboard"><span class="icon">🏠</span><span>Dashboard</span></button>
@@ -2650,7 +2650,7 @@ async function syncPush(silent) {
   const token = syncToken();
   if (!token) { if (!silent) toast('Enter a GitHub token in Settings → Cloud Sync first.'); return; }
   const payload = JSON.stringify(state, null, 2);
-  const body = { description: 'Khairul Budget Tracker data', public: false,
+  const body = { description: 'Finance Tracker data', public: false,
     files: { [GIST_FILENAME]: { content: payload } } };
   try {
     const gistId = syncGistId();

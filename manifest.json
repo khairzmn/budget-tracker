@@ -1,7 +1,7 @@
 {
-  "name": "Khairul Budget Tracker",
-  "short_name": "Budget",
-  "description": "Personal budget tracker with investments, CPF and precious metals",
+  "name": "Finance Tracker",
+  "short_name": "Finance",
+  "description": "Personal finance tracker with investments, CPF and precious metals",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
