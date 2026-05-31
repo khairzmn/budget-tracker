@@ -2778,6 +2778,68 @@ if ('serviceWorker' in navigator) {
   updateMonthLabel();
   renderDashboard();
 })();
+
+// ─── Pull-to-refresh (mobile) ───
+(function () {
+  const main     = document.getElementById('main');
+  const THRESHOLD = 72;   // px drag needed to trigger
+  const MAX_PULL  = 100;  // px max visual stretch
+
+  let startY = 0, pulling = false, indicator = null;
+
+  function getIndicator() {
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.id = 'ptr-indicator';
+      indicator.style.cssText = [
+        'position:fixed','top:0','left:0','right:0',
+        'display:flex','align-items:center','justify-content:center',
+        'gap:8px','height:0','overflow:hidden',
+        'background:rgba(0,122,255,0.12)',
+        'color:#007AFF','font-size:.8125rem','font-weight:600',
+        'transition:height .2s ease',
+        'z-index:300','pointer-events:none',
+        '-webkit-font-smoothing:antialiased',
+      ].join(';');
+      document.body.appendChild(indicator);
+    }
+    return indicator;
+  }
+
+  main.addEventListener('touchstart', e => {
+    if (main.scrollTop === 0) {
+      startY  = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  main.addEventListener('touchmove', e => {
+    if (!pulling) return;
+    const dy = Math.min(e.touches[0].clientY - startY, MAX_PULL);
+    if (dy <= 0) return;
+    const ind = getIndicator();
+    const pct = Math.min(dy / THRESHOLD, 1);
+    ind.style.height = dy * 0.5 + 'px';
+    ind.innerHTML = pct < 1
+      ? `<span style="opacity:${0.4 + pct * 0.6}">↓ Pull to refresh</span>`
+      : `<span>↑ Release to refresh</span>`;
+  }, { passive: true });
+
+  main.addEventListener('touchend', async e => {
+    if (!pulling) return;
+    pulling = false;
+    const dy = e.changedTouches[0].clientY - startY;
+    const ind = getIndicator();
+    if (dy >= THRESHOLD) {
+      ind.innerHTML = '<span>Syncing…</span>';
+      ind.style.height = '40px';
+      await syncPull();
+    }
+    ind.style.height = '0';
+    ind.innerHTML = '';
+    startY = 0;
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>
