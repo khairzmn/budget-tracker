@@ -327,7 +327,7 @@
       color: var(--text);
       border: none;
     }
-    .btn.secondary:hover { background: rgba(0,0,0,0.1); }
+    .btn.secondary:hover { background: rgba(255,255,255,0.12); }
     .btn.danger { background: var(--red); }
     .btn.danger:hover { background: #e62e24; }
 
@@ -471,7 +471,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.35);
+      background: rgba(0,0,0,0.6);
       backdrop-filter: blur(8px) saturate(150%);
       -webkit-backdrop-filter: blur(8px) saturate(150%);
       display: flex;
@@ -486,14 +486,13 @@
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
 
     .modal {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: #1c2128;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
       padding: 26px 28px 28px;
       width: 100%;
       max-width: 480px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 20px 60px rgba(0,0,0,0.2);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.7);
       transform: translateY(10px) scale(.98);
       transition: transform .22s cubic-bezier(.34,1.4,.64,1);
     }
@@ -521,8 +520,8 @@
     .form-group input,
     .form-group select,
     .form-group textarea {
-      background: rgba(0,0,0,0.04);
-      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: var(--radius-sm);
       padding: 9px 12px;
       font-size: .875rem;
@@ -532,13 +531,18 @@
       transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
     }
 
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--text-subtle); }
+
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
       border-color: var(--accent);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+      background: rgba(255,255,255,0.09);
+      box-shadow: 0 0 0 3px rgba(88,166,255,0.18);
     }
+
+    .form-group select option { background: #1c2128; color: var(--text); }
 
     .form-group .checkbox-row {
       display: flex;
@@ -547,6 +551,7 @@
       padding: 9px 0;
       cursor: pointer;
       font-size: .875rem;
+      color: var(--text);
     }
 
     .form-group .checkbox-row input[type=checkbox] {
@@ -562,7 +567,7 @@
       justify-content: flex-end;
       margin-top: 22px;
       padding-top: 18px;
-      border-top: 1px solid rgba(0,0,0,0.07);
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
 
     /* ─── Goals page ─── */
