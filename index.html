@@ -23,8 +23,8 @@
     :root {
       /* ── Dark theme ── */
       --bg: #0d1117;
-      --surface: #161b22;
-      --surface-2: #1c2128;
+      --surface: #ffffff;
+      --surface-2: #f5f6fa;
       --sidebar: rgba(13,17,23,0.95);
       --sidebar-hover: rgba(255,255,255,0.07);
       --sidebar-active: rgba(0,122,255,0.85);
@@ -203,6 +203,15 @@
 
     .page { display: none; padding: 28px; flex-direction: column; gap: 22px; }
     .page.active { display: flex; }
+
+    /* ─── Light-surface text override (cards are white on dark page) ─── */
+    .card, .chart-card, .tx-table, .filters,
+    .settings-card, .goal-card, .tx-modal .modal-content,
+    .gold-panel, .cpf-table-wrap {
+      color: #1c1c1e;
+    }
+    .card .card-label, .card .card-sub,
+    .chart-card h3, .tx-table th { color: #636366; }
 
     /* ─── Cards ─── */
     .cards-row {
@@ -1850,7 +1859,7 @@ function renderDashboard() {
     type: 'doughnut',
     data: {
       labels: catLabels.length ? catLabels : ['No expenses'],
-      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#161b22' }],
+      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#ffffff' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
