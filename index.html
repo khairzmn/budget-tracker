@@ -8,7 +8,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1c1c1e" />
+  <meta name="theme-color" content="#0d1117" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -21,35 +21,35 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      /* ── macOS Sonoma / Ventura system palette ── */
-      --bg: #f2f2f7;
-      --surface: #ffffff;
-      --surface-2: #f9f9fb;
-      --sidebar: rgba(30,30,32,0.88);
-      --sidebar-hover: rgba(255,255,255,0.08);
+      /* ── Dark theme ── */
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #1c2128;
+      --sidebar: rgba(13,17,23,0.95);
+      --sidebar-hover: rgba(255,255,255,0.07);
       --sidebar-active: rgba(0,122,255,0.85);
-      --accent: #007AFF;
-      --accent-dark: #0066d6;
-      --accent-light: rgba(0,122,255,0.1);
-      --green: #34C759;
-      --green-light: rgba(52,199,89,0.12);
-      --red: #FF3B30;
-      --red-light: rgba(255,59,48,0.12);
-      --blue: #007AFF;
-      --blue-light: rgba(0,122,255,0.1);
-      --amber: #FF9500;
-      --amber-light: rgba(255,149,0,0.12);
-      --silver: #8e8e93;
-      --text: #1c1c1e;
-      --text-muted: #636366;
-      --text-subtle: #6e6e73;
-      --border: rgba(0,0,0,0.1);
-      --border-subtle: rgba(0,0,0,0.05);
+      --accent: #58a6ff;
+      --accent-dark: #388bfd;
+      --accent-light: rgba(88,166,255,0.12);
+      --green: #3fb950;
+      --green-light: rgba(63,185,80,0.14);
+      --red: #f85149;
+      --red-light: rgba(248,81,73,0.14);
+      --blue: #58a6ff;
+      --blue-light: rgba(88,166,255,0.12);
+      --amber: #d29922;
+      --amber-light: rgba(210,153,34,0.14);
+      --silver: #8b949e;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --text-subtle: #6e7681;
+      --border: rgba(255,255,255,0.08);
+      --border-subtle: rgba(255,255,255,0.04);
       --radius: 12px;
       --radius-sm: 8px;
-      --shadow: 0 0 0 1px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
-      --shadow-sm: 0 0 0 1px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
-      --shadow-lg: 0 0 0 1px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.12);
+      --shadow: 0 0 0 1px rgba(255,255,255,.06), 0 2px 8px rgba(0,0,0,.4);
+      --shadow-sm: 0 0 0 1px rgba(255,255,255,.04), 0 1px 3px rgba(0,0,0,.3);
+      --shadow-lg: 0 0 0 1px rgba(255,255,255,.06), 0 8px 32px rgba(0,0,0,.6);
     }
 
     body {
@@ -146,11 +146,11 @@
     }
 
     .topbar {
-      background: rgba(255,255,255,0.78);
+      background: rgba(13,17,23,0.85);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       padding: 13px 28px;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: center;
       position: sticky;
@@ -159,10 +159,10 @@
     }
 
     .month-nav-bar {
-      background: rgba(255,255,255,0.72);
+      background: rgba(13,17,23,0.80);
       backdrop-filter: blur(16px) saturate(160%);
       -webkit-backdrop-filter: blur(16px) saturate(160%);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
       padding: 8px 28px;
       display: flex;
       align-items: center;
@@ -186,7 +186,7 @@
     }
 
     .month-nav button {
-      background: rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.07);
       border: none;
       border-radius: 7px;
       width: 28px; height: 28px;
@@ -216,7 +216,7 @@
       border-radius: var(--radius);
       padding: 20px 22px;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       transition: box-shadow .15s ease;
     }
 
@@ -249,7 +249,7 @@
 
     /* ─── Progress bar ─── */
     .progress-wrap {
-      background: rgba(0,0,0,0.07);
+      background: rgba(255,255,255,0.08);
       border-radius: 999px;
       height: 5px;
       overflow: hidden;
@@ -276,7 +276,7 @@
       border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
     }
 
     .chart-card h3 {
@@ -338,7 +338,7 @@
       margin-bottom: 16px;
       flex-wrap: wrap;
       background: var(--surface);
-      border: 1px solid rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 12px 16px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.06);
@@ -388,7 +388,7 @@
     .tx-table table { width: 100%; border-collapse: collapse; }
 
     .tx-table th {
-      background: rgba(0,0,0,0.025);
+      background: rgba(255,255,255,0.03);
       font-size: .67rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -416,8 +416,8 @@
       color: var(--text);
     }
 
-    .tx-table tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
-    .tx-table tr:hover td { background: rgba(0,122,255,0.04); }
+    .tx-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .tx-table tr:hover td { background: rgba(88,166,255,0.06); }
 
     .badge {
       display: inline-flex;
@@ -819,7 +819,7 @@
         padding: 12px 16px;
         padding-top: calc(12px + env(safe-area-inset-top, 0));
         gap: 10px;
-        background: rgba(242,242,247,0.85);
+        background: rgba(13,17,23,0.92);
       }
       .topbar h1 { font-size: 1rem; }
 
@@ -1780,7 +1780,7 @@ const _charts = {};
 // ── Chart.js global defaults: sans-serif system font ──
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif";
 Chart.defaults.font.size   = 11;
-Chart.defaults.color       = '#8e8e93';
+Chart.defaults.color       = '#8b949e';
 
 function makeChart(id, config) {
   if (_charts[id]) { _charts[id].destroy(); }
@@ -1850,7 +1850,7 @@ function renderDashboard() {
     type: 'doughnut',
     data: {
       labels: catLabels.length ? catLabels : ['No expenses'],
-      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#ffffff' }],
+      datasets: [{ data: catLabels.length ? catData : [1], backgroundColor: PALETTE, borderWidth: 3, borderColor: '#161b22' }],
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -1891,12 +1891,12 @@ function renderDashboard() {
         y: {
           beginAtZero: true,
           ticks: { callback: v => fmt(v) },
-          grid: { color: 'rgba(0,0,0,0.05)' },
-          border: { color: 'rgba(0,0,0,0.08)' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
         },
         x: {
           grid: { display: false },
-          border: { color: 'rgba(0,0,0,0.08)' },
+          border: { color: 'rgba(255,255,255,0.08)' },
         },
       },
     },
