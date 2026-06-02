@@ -1005,7 +1005,7 @@
     <!-- Recent transactions -->
     <div>
       <div class="section-header">
-        <h2>This Month's Transactions</h2>
+        <h2 id="dashboard-tx-heading">This Month's Transactions</h2>
         <button class="btn" id="btn-add-quick">+ Add Transaction</button>
       </div>
       <div class="tx-table" id="recent-tx-table">
@@ -1853,6 +1853,9 @@ function renderDashboard() {
   }
 
   const ym = currentMonthKey();
+  const monthLabel = viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const headEl = document.getElementById('dashboard-tx-heading');
+  if (headEl) headEl.textContent = monthLabel + ' — Transactions';
   const txs = txInMonth(ym);
   const income = sumBy(txs, 'income');
   const expenses = sumBy(txs, 'expense');
